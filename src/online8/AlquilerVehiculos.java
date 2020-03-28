@@ -32,7 +32,8 @@ public class AlquilerVehiculos {
     private static ArrayList<Vehiculo> vehiculos = new ArrayList<>();
     //private static Cliente[] clientes = new Cliente[MAX_CLIENTES];
     private static ArrayList<Cliente> clientes = new ArrayList<>();
-    private static Alquiler[] alquileres = new Alquiler[MAX_ALQUILERES];
+    private static ArrayList<Alquiler> alquileres = new ArrayList<>();
+    //private static Alquiler[] alquileres = new Alquiler[MAX_ALQUILERES];
 
     public AlquilerVehiculos() {
     }
@@ -151,18 +152,17 @@ lo devuelva si este existe o null en caso contrario.*/
 
                             if (!vehiculo.getDisponible()) {
 
-                                for (int i = 0; i < alquileres.length && !value; i++) {
-                                    if (alquileres[i] != null) {
+                                for (int i = 0; i < alquileres.size() && !value; i++) {
 
-                                        if (alquileres[i].getCliente().equals(cliente) && alquileres[i].getVehiculo().equals(vehiculo)) {
+                                    if (alquileres.get(i).getCliente().equals(cliente) && alquileres.get(i).getVehiculo().equals(vehiculo)) {
 
-                                            alquileres[i].cerrar(vehiculos);
-                                            value = true;
+                                        alquileres.get(i).cerrar(vehiculos);
+                                        value = true;
 
-                                            System.out.println("\nPrecio alquiler: " + alquileres[i].precioAlquiler() + "€ ");
-                                            break;
-                                        }
+                                        System.out.println("\nPrecio alquiler: " + alquileres.get(i).precioAlquiler() + "€ ");
+                                        break;
                                     }
+
                                 }
                                 if (!value) {
                                     escribirLn("\n********************ATENCION********************");
@@ -377,7 +377,7 @@ lo devuelva si este existe o null en caso contrario.*/
                 nuevoAlquiler.setFecha(fechaAlquiler);
                 nuevoAlquiler.setDias(dias);
 
-                alquileres[i] = nuevoAlquiler;
+                alquileres.add(nuevoAlquiler);
 
             }
 
@@ -414,7 +414,7 @@ lo devuelva si este existe o null en caso contrario.*/
             escribirLn("1. Añadir cliente.\n2. Borrar cliente.\n3. Listar clientes.\n"
                     + "4. Añadir vehiculo.\n5. Borrar vehiculo.\n6. Listar vehiculos.\n"
                     + "7. Nuevo alquiler.\n8. Cerrar alquiler.\n9. Listar alquileres.\n"
-                    + "10. Guardar datos.\n11. Crear copia de seguridad.\nSalir");
+                    + "10. Guardar datos.\n11. Crear copia de seguridad.\n12. Salir");
 
             opcion = leerEntero("\nIntroduce opción: ");
 
@@ -484,15 +484,6 @@ y si no existe ningún otro con el mismo DNI o muestre un mensaje con el error q
         int pos = -1;
         boolean encontrado = false;
 
-        //Primero comprobamos si existen espacios libres
-//        for (int i = 0; i < clientes.size(); i++) {
-//
-//            if (clientes[i] == null) {
-//                pos = i;
-//                break;
-//            }
-//        }
-        //Encontrado un espacio comparamos los dni        
         if (pos != -1) {
             for (int i = 0; i < clientes.size(); i++) {
                 if (clientes.get(i).getDni().equalsIgnoreCase(c.getDni())) {
@@ -579,7 +570,7 @@ y si no existe ningún otro con el mismo DNI o muestre un mensaje con el error q
                 vehiculos.remove(vehiculos.get(i));
 
                 pos = i;
-               
+
             }
         }
         if (pos == -1) {
@@ -589,7 +580,7 @@ y si no existe ningún otro con el mismo DNI o muestre un mensaje con el error q
         } else {
 
             escribirLn("\n               Cliente borrado.");
-            escribirLn(  "------------------------------------------------\n");
+            escribirLn("------------------------------------------------\n");
         }
     }
 
@@ -620,13 +611,13 @@ y si no existe ningún otro con el mismo DNI o muestre un mensaje con el error q
 
     public static void caseListarClientes() {
 
-        if (clientes.isEmpty()){
+        if (clientes.isEmpty()) {
             escribirLn("\n********************ATENCION********************");
             escribirLn("               No existen clientes.");
-            escribirLn("------------------------------------------------\n"); 
-        }else{
-        for (int i = 0; i < clientes.size(); i++) {
-            escribirLn(clientes.get(i).toString());
+            escribirLn("------------------------------------------------\n");
+        } else {
+            for (int i = 0; i < clientes.size(); i++) {
+                escribirLn(clientes.get(i).toString());
             }
         }
     }
@@ -831,13 +822,13 @@ error que se ha producido.*/
 
                                 if (vehiculos.get(posVehiculo).getDisponible() == true) {
 
-                                    for (int i = 0; i < alquileres.length && !value; i++) {
-                                        if (alquileres[i] == null) {
-                                            vehiculos.get(posVehiculo).setDisponible(false);
-                                            alquileres[i] = new Alquiler(clientes.get(posCliente), vehiculos.get(posVehiculo));
-                                            System.out.println(alquileres[i]);
-                                            value = true;
-                                        }
+                                    for (int i = 0; i < alquileres.size() && !value; i++) {
+
+                                        vehiculos.get(posVehiculo).setDisponible(false);
+                                        alquileres.add(new Alquiler(clientes.get(posCliente), vehiculos.get(posVehiculo)));
+                                        System.out.println(alquileres.get(i));
+                                        value = true;
+
                                     }
 
                                     if (!value) {
@@ -888,117 +879,13 @@ error que se ha producido.*/
 
     }
 
-    public static void caseCerrarAlquiler() {
-        /* String dni;
-        String dniAux;
-        String matricula;
-        int posCliente;
-        int posVehiculo;
-        boolean value = false;
-        Cliente cliente;
-        Vehiculo vehiculo;
-
-        dni = (leerCadena("\nIntroduce Dni/Nie del cliente: ")).toUpperCase();
-        dniAux = dni;
-
-        if (comprobarDni(dniAux)) {
-
-            //Comprobamos si es un NIE, y en caso de serlo lo convertimos a DNI para posteriormente
-            //comprobar la letra final.
-            if (dniAux.substring(0, 1).equalsIgnoreCase("X")
-                    || dniAux.substring(0, 1).equalsIgnoreCase("Y")
-                    || dniAux.substring(0, 1).equalsIgnoreCase("Z")) {
-                dniAux = pasarNieADni(dniAux);
-            }
-
-            //Comprobamos la letra final del dni para validarlo
-            if (dniAux.substring(8, 9).equalsIgnoreCase(calcularLetraDni(dniAux.substring(0, 8)))) {
-
-                posCliente = buscarCliente(dni);
-
-                if (posCliente != -1) {
-
-                    cliente = clientes[posCliente];
-
-                    matricula = leerCadena("\nIntroduce matricula del vehículo: ").toUpperCase();
-
-                    if (comprobarMatricula(matricula)) {
-
-                        posVehiculo = buscarVehiculo(matricula);
-
-                        if (posVehiculo != -1) {
-
-                            vehiculo = vehiculos[posVehiculo];
-
-                            if (!vehiculo.getDisponible()) {
-
-                                for (int i = 0; i < alquileres.length && !value; i++) {
-                                    if (alquileres[i] != null) {
-
-                                        if (alquileres[i].getCliente().equals(cliente) && alquileres[i].getVehiculo().equals(vehiculo)) {
-
-                                            alquileres[i].cerrar(vehiculos);
-                                            value = true;
-
-                                        }
-                                    }
-                                }
-
-                                if (!value) {
-                                    escribirLn("\n********************ATENCION********************");
-                                    escribirLn("No hay alquileres que contengan el cliente y el vehiculo indicado.");
-                                    escribirLn("------------------------------------------------\n");
-                                } else {
-                                    escribirLn("\nAlquiler cerrado correctamente");
-                                    escribirLn("------------------------------------------------\n");
-                                }//FIN
-
-                            } else {
-                                escribirLn("\n********************ATENCION********************");
-                                escribirLn("        El vehiculo no está en alquiler.");
-                                escribirLn("------------------------------------------------\n");
-                            }
-
-                        } else {
-                            escribirLn("\n********************ATENCION********************");
-                            escribirLn("        El vehículo no está registrado.");
-                            escribirLn("------------------------------------------------\n");
-                        }
-
-                    } else {
-                        escribirLn("\n********************ATENCION********************");
-                        escribirLn("      Formato de matrícula incorrecto.");
-                        escribirLn("------------------------------------------------\n");
-                    }
-
-                } else {
-                    escribirLn("\n********************ATENCION********************");
-                    escribirLn("No hay ningún cliente registro con el Dni/Nie proporciado");
-                    escribirLn("------------------------------------------------\n");
-                }
-
-            } else {
-                escribirLn("\n********************ATENCION********************");
-                escribirLn("        Letra del Dni/Nie incorrecto.");
-                escribirLn("------------------------------------------------\n");
-            }
-
-        } else {
-            escribirLn("\n********************ATENCION********************");
-            escribirLn("        Formato de Dni/Nie incorrecto.");
-            escribirLn("------------------------------------------------\n");
-        }
-         */
-    }
-
     public static void caseListarAlquileres() {
         boolean vacio = true;
 
-        for (int i = 0; i < alquileres.length; i++) {
-            if (alquileres[i] != null) {
-                escribirLn(alquileres[i].toString());
-                vacio = false;
-            }
+        for (int i = 0; i < alquileres.size(); i++) {
+
+            escribirLn(alquileres.get(i).toString());
+            vacio = false;
 
         }
         if (vacio) {
@@ -1018,11 +905,9 @@ error que se ha producido.*/
         //escribirArchivo(String ruta, String datos, boolean sobreescribir)
         for (int i = 0; i < clientes.size(); i++) {
 
-
-                datosCliente += clientes.get(i).getDni() + "#" + clientes.get(i).getNombre()
-                        + "#" + clientes.get(i).getDireccion() + "#" + clientes.get(i).getLocalidad()
-                        + "#" + clientes.get(i).getCodigoPostal() + "\n";
-            
+            datosCliente += clientes.get(i).getDni() + "#" + clientes.get(i).getNombre()
+                    + "#" + clientes.get(i).getDireccion() + "#" + clientes.get(i).getLocalidad()
+                    + "#" + clientes.get(i).getCodigoPostal() + "\n";
 
         }
 
@@ -1092,16 +977,16 @@ error que se ha producido.*/
 
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 
-        for (int i = 0; i < alquileres.length; i++) {
+        for (int i = 0; i < alquileres.size(); i++) {
 
-            if (alquileres[i] != null) {
+ 
 
-                datosAlquileres += alquileres[i].getCliente().getDni() + "#"
-                        + alquileres[i].getVehiculo().getMatricula() + "#"
-                        + sdf.format(alquileres[i].getFecha().getTime())
-                        + "#" + alquileres[i].getDias() + "\n";
+                datosAlquileres += alquileres.get(i).getCliente().getDni() + "#"
+                        + alquileres.get(i).getVehiculo().getMatricula() + "#"
+                        + sdf.format(alquileres.get(i).getFecha().getTime())
+                        + "#" + alquileres.get(i).getDias() + "\n";
 
-            }
+            
 
         }
         if (escribirArchivo(rutaA, datosAlquileres, true)) {

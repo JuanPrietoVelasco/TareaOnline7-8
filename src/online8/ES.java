@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package online7;
+package online8;
 
 import java.io.*;
 import java.util.Scanner;

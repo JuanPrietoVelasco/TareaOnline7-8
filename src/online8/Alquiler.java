@@ -1,7 +1,8 @@
-package online7;
+package online8;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 
 /**
@@ -50,7 +51,7 @@ public class Alquiler {
     
 
     
-    public void cerrar(Vehiculo[] vehiculos) {
+    public void cerrar(ArrayList <Vehiculo> vehiculos) {
         
         /*Crea un método cerrar que cerrará el alquiler, para lo que, partiendo de la
     fecha actual y la fecha en que se realizó el alquiler, calcule el número de
@@ -58,12 +59,12 @@ public class Alquiler {
         
         this.dias = diferenciaDias(Calendar.getInstance());
 
-        for (int i = 0; i < vehiculos.length; i++) {
-            if (vehiculos[i] != null) {
-                if (vehiculos[i].equals(this.vehiculo)) {
-                    vehiculos[i].setDisponible(true);
+        for (int i = 0; i < vehiculos.size(); i++) {
+            
+                if (vehiculos.get(i).equals(this.vehiculo)) {
+                    vehiculos.get(i).setDisponible(true);
                 }
-            }
+            
 
         }
         this.vehiculo.setDisponible(true);

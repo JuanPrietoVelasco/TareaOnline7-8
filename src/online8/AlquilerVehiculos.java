@@ -3,19 +3,22 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package online7;
+package online8;
 
+import java.io.File;
 import java.text.Format;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Scanner;
-import static online7.ES.*;
-import static online7.Utilidades.*;
-import static online7.Cliente.*;
-import static online7.Enumerados.*;
-import static online7.Mercancias.*;
-import static online7.Alquiler.*;
+import static online8.ES.*;
+import static online8.Utilidades.*;
+import static online8.Cliente.*;
+import static online8.Enumerados.*;
+import static online8.Mercancias.*;
+import static online8.Alquiler.*;
 
 /**
  * @author juan
@@ -25,8 +28,10 @@ public class AlquilerVehiculos {
     private static final int MAX_VEHICULOS = 50;
     private static final int MAX_CLIENTES = 50;
     private static final int MAX_ALQUILERES = 50;
-    private static Vehiculo[] vehiculos = new Vehiculo[MAX_VEHICULOS];
-    private static Cliente[] clientes = new Cliente[MAX_CLIENTES];
+    //private static Vehiculo[] vehiculos = new Vehiculo[MAX_VEHICULOS];
+    private static ArrayList<Vehiculo> vehiculos = new ArrayList<>();
+    //private static Cliente[] clientes = new Cliente[MAX_CLIENTES];
+    private static ArrayList<Cliente> clientes = new ArrayList<>();
     private static Alquiler[] alquileres = new Alquiler[MAX_ALQUILERES];
 
     public AlquilerVehiculos() {
@@ -39,8 +44,8 @@ public class AlquilerVehiculos {
         if ((Utilidades.comprobarDni(dni))) {
             for (int i = 0; i < MAX_CLIENTES; i++) {
                 //si la posicion array no es nula y coincide el dni existente lo devuelve
-                if (clientes[i] != null && clientes[i].getDni().equalsIgnoreCase(dni)) {
-                    c = clientes[i];
+                if (clientes.get(i).getDni().equalsIgnoreCase(dni)) {
+                    c = clientes.get(i);
                     break;
                 }
             }
@@ -55,8 +60,8 @@ public class AlquilerVehiculos {
 
         int pos = -1;
 
-        for (int i = 0; i < clientes.length; i++) {
-            if (clientes[i] != null && dni.equalsIgnoreCase(clientes[i].getDni())) {
+        for (int i = 0; i < clientes.size(); i++) {
+            if (dni.equalsIgnoreCase(clientes.get(i).getDni())) {
                 pos = i;
             }
         }
@@ -70,10 +75,15 @@ lo devuelva si este existe o null en caso contrario.*/
         Vehiculo v = null;
 
         if ((Utilidades.comprobarMatricula(matricula))) {
-            for (int i = 0; i < MAX_VEHICULOS; i++) {
-                //si la posicion array no es nula y coincide el dni existente lo devuelve
-                if (vehiculos[i] != null && vehiculos[i].getMatricula().equalsIgnoreCase(matricula)) {
-                    v = vehiculos[i];
+            for (int i = 0; i < vehiculos.size(); i++) {
+                //for (Vehiculo vehiculo : vehiculos){
+                //si la posicion array no es nula y coincide el dni existente lo devuelve        
+                if (vehiculos.get(i).getMatricula().equalsIgnoreCase(matricula)) {
+                    //if (vehiculo.getMatricula().equalsIgnoreCase(matricula)){
+                    //utilizar método get de arryLIst
+
+                    v = vehiculos.get(i);
+
                     break;
                 }
             }
@@ -86,8 +96,8 @@ lo devuelva si este existe o null en caso contrario.*/
 
         int pos = -1;
 
-        for (int i = 0; i < vehiculos.length; i++) {
-            if (vehiculos[i] != null && matricula.equalsIgnoreCase(vehiculos[i].getMatricula())) {
+        for (int i = 0; i < vehiculos.size(); i++) {
+            if (vehiculos.get(i).getMatricula().equalsIgnoreCase(matricula)) {
                 pos = i;
             }
         }
@@ -127,7 +137,7 @@ lo devuelva si este existe o null en caso contrario.*/
 
                 if (posCliente != -1) {
 
-                    cliente = clientes[posCliente];
+                    cliente = clientes.get(posCliente);
 
                     matricula = leerCadena("\nIntroduce matricula del vehículo: ").toUpperCase();
 
@@ -137,7 +147,7 @@ lo devuelva si este existe o null en caso contrario.*/
 
                         if (posVehiculo != -1) {
 
-                            vehiculo = vehiculos[posVehiculo];
+                            vehiculo = vehiculos.get(posVehiculo);
 
                             if (!vehiculo.getDisponible()) {
 
@@ -219,7 +229,7 @@ lo devuelva si este existe o null en caso contrario.*/
 
                 Cliente nuevoCliente = new Cliente(datos[0], datos[1], datos[2], datos[3], datos[4]);
 
-                clientes[i] = nuevoCliente;
+                clientes.add(nuevoCliente);
 
             }
 
@@ -261,9 +271,9 @@ lo devuelva si este existe o null en caso contrario.*/
                             tamanio = Enumerados.Tamanio.PEQUENIO;
                         }
 
-                        vehiculos[i] = new Furgoneta(matricula, marca, modelo, cilindrada,
-                                pma, volumen, refrigerado, tamanio);
-                        vehiculos[i].setDisponible(disponible);
+                        vehiculos.add(new Furgoneta(matricula, marca, modelo, cilindrada,
+                                pma, volumen, refrigerado, tamanio));
+                        vehiculos.get(i).setDisponible(disponible);
                         break;
 
                     case "Deportivo":
@@ -297,9 +307,9 @@ lo devuelva si este existe o null en caso contrario.*/
 
                         boolean descapotable = (datos[9].equalsIgnoreCase("true")) ? true : false;
 
-                        vehiculos[i] = new Deportivo(matricula, marca, modelo, cilindrada, numPuertas,
-                                combustible, cambio, descapotable);
-                        vehiculos[i].setDisponible(disponible);
+                        vehiculos.add(new Deportivo(matricula, marca, modelo, cilindrada, numPuertas,
+                                combustible, cambio, descapotable));
+                        vehiculos.get(i).setDisponible(disponible);
                         break;
 
                     case "Familiar":
@@ -323,9 +333,9 @@ lo devuelva si este existe o null en caso contrario.*/
                         int numPlazas = Integer.parseInt(datos[8]);
                         boolean sillaBebe = (datos[9].equalsIgnoreCase("true")) ? true : false;
 
-                        vehiculos[i] = new Familiar(matricula, marca, modelo, cilindrada, numPuertasFami,
-                                combustibleFami, numPlazas, sillaBebe);
-                        vehiculos[i].setDisponible(disponible);
+                        vehiculos.add(new Familiar(matricula, marca, modelo, cilindrada, numPuertasFami,
+                                combustibleFami, numPlazas, sillaBebe));
+                        vehiculos.get(i).setDisponible(disponible);
                         break;
                 }
 
@@ -349,9 +359,9 @@ lo devuelva si este existe o null en caso contrario.*/
                 String fecha = datos[2];
                 int dias = Integer.parseInt(datos[3]);
 
-                Cliente nuevoCliente = clientes[buscarCliente(dni)];
+                Cliente nuevoCliente = clientes.get(buscarCliente(dni));
 
-                Vehiculo nuevoVehiculo = vehiculos[buscarVehiculo(matricula)];
+                Vehiculo nuevoVehiculo = vehiculos.get(buscarVehiculo(matricula));
 
                 String[] datosFecha = fecha.split("[/ :]+");
 
@@ -374,7 +384,7 @@ lo devuelva si este existe o null en caso contrario.*/
         }
         System.out.println("\nDatos cargados desde los archivos correctamente.");
     }
-    
+
     //
     //
 //
@@ -404,7 +414,7 @@ lo devuelva si este existe o null en caso contrario.*/
             escribirLn("1. Añadir cliente.\n2. Borrar cliente.\n3. Listar clientes.\n"
                     + "4. Añadir vehiculo.\n5. Borrar vehiculo.\n6. Listar vehiculos.\n"
                     + "7. Nuevo alquiler.\n8. Cerrar alquiler.\n9. Listar alquileres.\n"
-                    + "10. Guardar datos.\n11. Salir.");
+                    + "10. Guardar datos.\n11. Crear copia de seguridad.\nSalir");
 
             opcion = leerEntero("\nIntroduce opción: ");
 
@@ -437,9 +447,12 @@ lo devuelva si este existe o null en caso contrario.*/
                     caseListarAlquileres();
                     break;
                 case 10:
-                    caseGuardarDatos();
+                    caseGuardarDatos("C:\\Users\\juans\\Documents\\NetBeansProjects\\Online8");
                     break;
                 case 11:
+                    crearCopiaSeg();
+                    break;
+                case 12:
                     caseConfirmarGuardarDatos();
                     escribirLn("\n               Fin de programa");
                     escribirLn("------------------------------------------------\n");
@@ -454,7 +467,7 @@ lo devuelva si este existe o null en caso contrario.*/
 
             }
 
-        } while (opcion != 11);
+        } while (opcion != 12);
 
     }
 //    
@@ -472,25 +485,21 @@ y si no existe ningún otro con el mismo DNI o muestre un mensaje con el error q
         boolean encontrado = false;
 
         //Primero comprobamos si existen espacios libres
-        for (int i = 0; i < clientes.length; i++) {
-
-            if (clientes[i] == null) {
-                pos = i;
-                break;
-            }
-        }
+//        for (int i = 0; i < clientes.size(); i++) {
+//
+//            if (clientes[i] == null) {
+//                pos = i;
+//                break;
+//            }
+//        }
         //Encontrado un espacio comparamos los dni        
         if (pos != -1) {
-            for (int i = 0; i < clientes.length; i++) {
-                if (clientes[i] != null && clientes[i].getDni().equalsIgnoreCase(c.getDni())) {
+            for (int i = 0; i < clientes.size(); i++) {
+                if (clientes.get(i).getDni().equalsIgnoreCase(c.getDni())) {
                     encontrado = true;
                     break;
                 }
             }
-        } else {
-            escribirLn("\n********************ATENCION********************");
-            escribirLn("No hay espacio para nuevos clientes");
-            escribirLn("------------------------------------------------\n");
         }
 
         if (encontrado) {
@@ -498,8 +507,8 @@ y si no existe ningún otro con el mismo DNI o muestre un mensaje con el error q
             escribirLn("Dni/Nie ya registrado. Cliente no añadido.");
             escribirLn("------------------------------------------------\n");
         } else {
-            clientes[pos] = c;
-            escribirLn(clientes[pos].toString());
+            clientes.add(c);
+            escribirLn(clientes.get(pos).toString());
             escribirLn("\nCliente añadido correctamente.");
             escribirLn("------------------------------------------------\n");
         }
@@ -562,20 +571,25 @@ y si no existe ningún otro con el mismo DNI o muestre un mensaje con el error q
     public static void borrarCliente(String dni) {
         /*Crea un método borrarCliente que elimine un cliente, dado su DNI.*/
 
-        boolean eliminado = false;
-        for (int i = 0; i < clientes.length; i++) {
-            if (clientes[i].getDni().equalsIgnoreCase(dni)) {
-                clientes[i] = null;
-                eliminado = true;
-                escribirLn("\nCliente borrado.");
-                escribirLn("------------------------------------------------\n");
-                break;
+        int pos = -1;
+
+        for (int i = 0; i < clientes.size(); i++) {
+            if (clientes.get(i).getDni().equalsIgnoreCase(dni)) {
+
+                vehiculos.remove(vehiculos.get(i));
+
+                pos = i;
+               
             }
         }
-        if (!eliminado) {
+        if (pos == -1) {
             escribirLn("\n********************ATENCION********************");
-            escribirLn("Dni/Nie no registrado.");
+            escribirLn("            Dni/Nie no registrado.");
             escribirLn("------------------------------------------------\n");
+        } else {
+
+            escribirLn("\n               Cliente borrado.");
+            escribirLn(  "------------------------------------------------\n");
         }
     }
 
@@ -606,18 +620,14 @@ y si no existe ningún otro con el mismo DNI o muestre un mensaje con el error q
 
     public static void caseListarClientes() {
 
-        boolean vacio = true;
-        for (int i = 0; i < clientes.length; i++) {
-            if (clientes[i] != null) {
-                escribirLn(clientes[i].toString());
-                vacio = false;
-
-            }
-        }
-        if (vacio) {
+        if (clientes.isEmpty()){
             escribirLn("\n********************ATENCION********************");
             escribirLn("               No existen clientes.");
-            escribirLn("------------------------------------------------\n");
+            escribirLn("------------------------------------------------\n"); 
+        }else{
+        for (int i = 0; i < clientes.size(); i++) {
+            escribirLn(clientes.get(i).toString());
+            }
         }
     }
 
@@ -630,118 +640,103 @@ error que se ha producido.*/
         int pos = -1;
         boolean encontrado = false;
 
-        //Comprobamos si existen espacios libres
-        for (int i = 0; i < vehiculos.length; i++) {
-
-            if (vehiculos[i] == null) {
-                pos = i;
-                break;
-            }
-        }
         //existe espacio en el array, ha dado toda la vuelta y pos no ha cambiado. Ahora comprobamos que no este ya guarda la matrícula
         //Si 0 esta vacia, pos = 0 por ser null, pero 0 aún no tine vehículo para poder comparar matrícula.(pos!=0)
-        if (pos != -1) {
+        //Existe espacio vacío. Comenzamos a pedir información al usuario.
+        String matricula = (leerCadena("\nIntroduce matrícula del vehículo: ")).toUpperCase();
 
-            //Existe espacio vacío. Comenzamos a pedir información al usuario.
-            String matricula = (leerCadena("\nIntroduce matrícula del vehículo: ")).toUpperCase();
+        if (comprobarMatricula(matricula)) {
 
-            if (comprobarMatricula(matricula)) {
+            for (int i = 0; i < vehiculos.size() && !encontrado; i++) {
 
-                for (int i = 0; i < vehiculos.length; i++) {
+                if (vehiculos.get(i).getMatricula().equalsIgnoreCase(matricula)) {
+                    // escribirLn(vehiculos[i].getMatricula());
+                    encontrado = true;
 
-                    if (vehiculos[i] != null && vehiculos[i].getMatricula().equalsIgnoreCase(matricula)) {
-                        // escribirLn(vehiculos[i].getMatricula());
-                        encontrado = true;
-                        break;
-                    }
                 }
+            }
 
-                if (encontrado) {
-                    escribirLn("\n********************ATENCION********************");
-                    escribirLn("Matrícula ya registrada. Vehiculo no añadido.");
+            if (encontrado) {
+                escribirLn("\n********************ATENCION********************");
+                escribirLn("Matrícula ya registrada. Vehiculo no añadido.");
+                escribirLn("------------------------------------------------\n");
+            } else {
+
+                //Si la matricula no está registrada, comenzamos a pedir los datos del vehiculo.
+                String marca = (leerCadena("\nIntroduce marca del vehículo: ")).toUpperCase();
+                String modelo = (leerCadena("\nIntroduce modelo del vehículo: ")).toUpperCase();
+                int cilindrada = leerEntero("\nIntroduce cilindrada del vehículo: ");
+                int seleccion = leerEntero(1, 2, "\nSelecciona tipo de vehículo.\n1.Mercancias.\n2.Turismo.");
+
+                if (seleccion == 1) {
+
+                    int pma = leerEntero("\nVas a registrar una furgoneta.\nIntroduce pma: ");
+                    int volumen = leerEntero("\nIntroduce volumen: ");
+                    boolean refrigerado = leerBoolean("\nVehículo refrigerado S/N");
+
+                    int posicion = leerEntero(1, 3, "\nSelecciona un tamaño:\n1.Grande\n2.Mediano\n3.Pequeño");
+
+                    Tamanio tamanio = Tamanio.values()[posicion - 1];
+
+                    Furgoneta furgoneta = new Furgoneta(matricula, marca, modelo, cilindrada, pma, volumen, refrigerado, tamanio);
+
+                    vehiculos.add(furgoneta);
+
+                    escribirLn("\nVehiculo añadido correctamente.");
                     escribirLn("------------------------------------------------\n");
+
                 } else {
 
-                    //Si la matricula no está registrada, comenzamos a pedir los datos del vehiculo.
-                    String marca = (leerCadena("\nIntroduce marca del vehículo: ")).toUpperCase();
-                    String modelo = (leerCadena("\nIntroduce modelo del vehículo: ")).toUpperCase();
-                    int cilindrada = leerEntero("\nIntroduce cilindrada del vehículo: ");
-                    int seleccion = leerEntero(1, 2, "\nSelecciona tipo de vehículo.\n1.Mercancias.\n2.Turismo.");
+                    int numPuertas = leerEntero(3, 5, "\nVas a añadir un turismo.\n\nIntroduce número de puertas entre 3 y 5:");
+
+                    int posicion = leerEntero(1, 4, "\nSelecciona tipo de combustible:\n1.Gasolina.\n2.Diesel.\n3.Híbrido.\n4.Eléctrico.");
+
+                    Combustible combustible = Combustible.values()[posicion - 1];
+
+                    seleccion = leerEntero(1, 2, "\nEscoja tipo de turismo:\n1.Familiar.\n2.Deportivo");
 
                     if (seleccion == 1) {
+                        escribirLn("\nHas escogido añadir un familiar.");
 
-                        int pma = leerEntero("\nVas a registrar una furgoneta.\nIntroduce pma: ");
-                        int volumen = leerEntero("\nIntroduce volumen: ");
-                        boolean refrigerado = leerBoolean("\nVehículo refrigerado S/N");
+                        int numPlazas = leerEntero(4, 7, "\nElija el número de plazas entre 4 y 7.");
 
-                        int posicion = leerEntero(1, 3, "\nSelecciona un tamaño:\n1.Grande\n2.Mediano\n3.Pequeño");
+                        boolean sillaBebe = leerBoolean("\n¿Tiene silla de bebe? S/N");
 
-                        Tamanio tamanio = Tamanio.values()[posicion - 1];
+                        Familiar familiar = new Familiar(matricula, marca, modelo, cilindrada, numPuertas, combustible, numPlazas, sillaBebe);
 
-                        Furgoneta furgoneta = new Furgoneta(matricula, marca, modelo, cilindrada, pma, volumen, refrigerado, tamanio);
+                        vehiculos.add(familiar);
 
-                        vehiculos[pos] = furgoneta;
-
-                        escribirLn("\nVehiculo añadido correctamente.");
+                        escribirLn("\nVehículo familiar añadido correctamente.");
                         escribirLn("------------------------------------------------\n");
 
                     } else {
+                        escribirLn("\nHas escogido añadir un deportivo");
 
-                        int numPuertas = leerEntero(3, 5, "\nVas a añadir un turismo.\n\nIntroduce número de puertas entre 3 y 5:");
+                        boolean descapotable = leerBoolean("\n¿Deportivo descapotable? S/N");
 
-                        int posicion = leerEntero(1, 4, "\nSelecciona tipo de combustible:\n1.Gasolina.\n2.Diesel.\n3.Híbrido.\n4.Eléctrico.");
+                        int opcion = leerEntero(1, 2, "\nSelecciona tipo de caja de cambios: \n1.Automático.\n2.Manual.");
 
-                        Combustible combustible = Combustible.values()[posicion - 1];
+                        CajaCambios cambio = CajaCambios.values()[opcion - 1];
 
-                        seleccion = leerEntero(1, 2, "\nEscoja tipo de turismo:\n1.Familiar.\n2.Deportivo");
+                        Deportivo deportivo = new Deportivo(matricula, marca, modelo, cilindrada, numPuertas, combustible, cambio, descapotable);
 
-                        if (seleccion == 1) {
-                            escribirLn("\nHas escogido añadir un familiar.");
+                        vehiculos.add(deportivo);
 
-                            int numPlazas = leerEntero(4, 7, "\nElija el número de plazas entre 4 y 7.");
-
-                            boolean sillaBebe = leerBoolean("\n¿Tiene silla de bebe? S/N");
-
-                            Familiar familiar = new Familiar(matricula, marca, modelo, cilindrada, numPuertas, combustible, numPlazas, sillaBebe);
-
-                            vehiculos[pos] = familiar;
-
-                            escribirLn("\nVehículo familiar añadido correctamente.");
-                            escribirLn("------------------------------------------------\n");
-
-                        } else {
-                            escribirLn("\nHas escogido añadir un deportivo");
-
-                            boolean descapotable = leerBoolean("\n¿Deportivo descapotable? S/N");
-
-                            int opcion = leerEntero(1, 2, "\nSelecciona tipo de caja de cambios: \n1.Automático.\n2.Manual.");
-
-                            CajaCambios cambio = CajaCambios.values()[opcion - 1];
-
-                            Deportivo deportivo = new Deportivo(matricula, marca, modelo, cilindrada, numPuertas, combustible, cambio, descapotable);
-
-                            vehiculos[pos] = deportivo;
-
-                            escribirLn("\nVehículo deportivo añadido correctamente.");
-                            escribirLn("------------------------------------------------\n");
-
-                        }
+                        escribirLn("\nVehículo deportivo añadido correctamente.");
+                        escribirLn("------------------------------------------------\n");
 
                     }
 
                 }
 
-            } else {
-                escribirLn("\n********************ATENCION********************");
-                escribirLn("Formato de matrícula incorrecto. Formato requerido tipo '1234BCD'. Vocales no aceptadas."
-                        + "\nEscoja de nuevo una opción del menu principal.");
-                escribirLn("------------------------------------------------\n");
-
             }
+
         } else {
             escribirLn("\n********************ATENCION********************");
-            escribirLn("No hay espacio para nuevos vehiculos.");
+            escribirLn("Formato de matrícula incorrecto. Formato requerido tipo '1234BCD'. Vocales no aceptadas."
+                    + "\nEscoja de nuevo una opción del menu principal.");
             escribirLn("------------------------------------------------\n");
+
         }
 
     }
@@ -751,16 +746,17 @@ error que se ha producido.*/
     array de vehiculos. */
 
         int pos = -1;
-        for (int i = 0; i < vehiculos.length; i++) {
-            if (vehiculos[i] != null && vehiculos[i].getMatricula().equalsIgnoreCase(m)) {
-                vehiculos[i] = null;
+        for (int i = 0; i < vehiculos.size() && pos == -1; i++) {
+            if (vehiculos.get(i).getMatricula().equalsIgnoreCase(m)) {
+                //Creamos un vehículo para compararlo con el que queremos borrar del ArrayList
+                Vehiculo v = vehiculos.get(i);
+                vehiculos.remove(v);
                 pos = i;
-                break;
             }
         }
         if (pos == -1) {
             escribirLn("\n********************ATENCION********************");
-            escribirLn("Matricula no registrada.");
+            escribirLn("           Matricula no registrada.");
             escribirLn("------------------------------------------------\n");
         } else {
             escribirLn("\nVehiculo borrado correctamente.");
@@ -783,22 +779,17 @@ error que se ha producido.*/
     }
 
     public static void caseListarVehiculos() {
-        boolean vacio = true;
+        boolean vacio = vehiculos.isEmpty();
 
-        for (int i = 0; i < vehiculos.length; i++) {
-            if (vehiculos[i] != null) {
-                escribirLn(vehiculos[i].toString());
-                vacio = false;
-            }
-
-            if (vacio) {
-
-                escribirLn("\n********************ATENCION********************");
-                escribirLn("             No existen vehículos.");
-                escribirLn("------------------------------------------------\n");
+        if (vacio) {
+            escribirLn("\n********************ATENCION********************");
+            escribirLn("             No existen vehículos.");
+            escribirLn("------------------------------------------------\n");
+        } else {
+            for (Vehiculo elemento : vehiculos) {
+                escribirLn(elemento.toString());
             }
         }
-
     }
 
     public static void caseNuevoAlquiler() {
@@ -838,12 +829,12 @@ error que se ha producido.*/
 
                             if (posVehiculo != -1) {
 
-                                if (vehiculos[posVehiculo].getDisponible() == true) {
+                                if (vehiculos.get(posVehiculo).getDisponible() == true) {
 
                                     for (int i = 0; i < alquileres.length && !value; i++) {
                                         if (alquileres[i] == null) {
-                                            vehiculos[posVehiculo].setDisponible(false);
-                                            alquileres[i] = new Alquiler(clientes[posCliente], vehiculos[posVehiculo]);
+                                            vehiculos.get(posVehiculo).setDisponible(false);
+                                            alquileres[i] = new Alquiler(clientes.get(posCliente), vehiculos.get(posVehiculo));
                                             System.out.println(alquileres[i]);
                                             value = true;
                                         }
@@ -1017,25 +1008,25 @@ error que se ha producido.*/
         }
     }
 
-    public static void caseGuardarDatos() {
+    public static void caseGuardarDatos(String ruta) {
 
         //Archivo para array clientes.
-        String ruta = "clientes.txt";
+        String rutaC = (ruta + "/clientes.txt");
 
         String datosCliente = "";
 
         //escribirArchivo(String ruta, String datos, boolean sobreescribir)
-        for (int i = 0; i < clientes.length; i++) {
+        for (int i = 0; i < clientes.size(); i++) {
 
-            if (clientes[i] != null) {
-                datosCliente += clientes[i].getDni() + "#" + clientes[i].getNombre()
-                        + "#" + clientes[i].getDireccion() + "#" + clientes[i].getLocalidad()
-                        + "#" + clientes[i].getCodigoPostal() + "\n";
-            }
+
+                datosCliente += clientes.get(i).getDni() + "#" + clientes.get(i).getNombre()
+                        + "#" + clientes.get(i).getDireccion() + "#" + clientes.get(i).getLocalidad()
+                        + "#" + clientes.get(i).getCodigoPostal() + "\n";
+            
 
         }
 
-        if (escribirArchivo(ruta, datosCliente, true)) {
+        if (escribirArchivo(rutaC, datosCliente, true)) {
             escribirLn("\nDatos de clientes guardados correctamente.");
             escribirLn("------------------------------------------------\n");
         } else {
@@ -1045,52 +1036,48 @@ error que se ha producido.*/
         }
 
         //Archivo para array vehículos
-        ruta = "vehiculos.txt";
+        String rutaV = (ruta + "/vehiculos.txt");
 
         String datosVehiculos = "";
 
-        for (int i = 0; i < vehiculos.length; i++) {
+        for (int i = 0; i < vehiculos.size(); i++) {
 
-            if (vehiculos[i] != null) {
+            if (vehiculos.get(i) instanceof Deportivo) {
 
-                if (vehiculos[i] instanceof Deportivo) {
+                Deportivo aux = (Deportivo) vehiculos.get(i);
 
-                    Deportivo aux = (Deportivo) vehiculos[i];
+                datosVehiculos += "Deportivo#" + aux.getMatricula() + "#" + aux.getMarca() + "#"
+                        + aux.getModelo() + "#" + aux.getCilindrada() + "#" + aux.getDisponible() + "#"
+                        + aux.getNumeroPuertas() + "#" + aux.getCombustible() + "#" + aux.getCambio()
+                        + "#" + aux.getDescapotable() + "\n";
 
-                    datosVehiculos += "Deportivo#" + aux.getMatricula() + "#" + aux.getMarca() + "#"
-                            + aux.getModelo() + "#" + aux.getCilindrada() + "#" + aux.getDisponible() + "#"
-                            + aux.getNumeroPuertas() + "#" + aux.getCombustible() + "#" + aux.getCambio()
-                            + "#" + aux.getDescapotable() + "\n";
+            }
 
-                }
+            if (vehiculos.get(i) instanceof Familiar) {
 
-                if (vehiculos[i] instanceof Familiar) {
+                Familiar aux = (Familiar) vehiculos.get(i);
 
-                    Familiar aux = (Familiar) vehiculos[i];
+                datosVehiculos += "Familiar#" + aux.getMatricula() + "#" + aux.getMarca() + "#"
+                        + aux.getModelo() + "#" + aux.getCilindrada() + "#" + aux.getDisponible() + "#"
+                        + aux.getNumeroPuertas() + "#" + aux.getCombustible() + "#" + aux.getNumPlazas()
+                        + "#" + aux.getSillaBebe() + "\n";
 
-                    datosVehiculos += "Familiar#" + aux.getMatricula() + "#" + aux.getMarca() + "#"
-                            + aux.getModelo() + "#" + aux.getCilindrada() + "#" + aux.getDisponible() + "#"
-                            + aux.getNumeroPuertas() + "#" + aux.getCombustible() + "#" + aux.getNumPlazas()
-                            + "#" + aux.getSillaBebe() + "\n";
+            }
 
-                }
+            if (vehiculos.get(i) instanceof Furgoneta) {
 
-                if (vehiculos[i] instanceof Furgoneta) {
+                Furgoneta aux = (Furgoneta) vehiculos.get(i);
 
-                    Furgoneta aux = (Furgoneta) vehiculos[i];
-
-                    datosVehiculos += "Furgoneta#" + aux.getMatricula() + "#" + aux.getMarca() + "#"
-                            + aux.getModelo() + "#" + aux.getCilindrada() + "#" + aux.getDisponible() + "#"
-                            + aux.getPma() + "#" + aux.getVolumen() + "#" + aux.getRefrigerado() + "#"
-                            + aux.getTamanio() + "\n";
-
-                }
+                datosVehiculos += "Furgoneta#" + aux.getMatricula() + "#" + aux.getMarca() + "#"
+                        + aux.getModelo() + "#" + aux.getCilindrada() + "#" + aux.getDisponible() + "#"
+                        + aux.getPma() + "#" + aux.getVolumen() + "#" + aux.getRefrigerado() + "#"
+                        + aux.getTamanio() + "\n";
 
             }
 
         }
 
-        if (escribirArchivo(ruta, datosVehiculos, true)) {
+        if (escribirArchivo(rutaV, datosVehiculos, true)) {
             escribirLn("\nDatos de vehículos guardados correctamente.");
             escribirLn("------------------------------------------------\n");
         } else {
@@ -1100,7 +1087,7 @@ error que se ha producido.*/
         }
 
         //Archivo para array alquileres
-        ruta = "alquileres.txt";
+        String rutaA = (ruta + "/alquileres.txt");
         String datosAlquileres = "";
 
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
@@ -1117,7 +1104,7 @@ error que se ha producido.*/
             }
 
         }
-        if (escribirArchivo(ruta, datosAlquileres, true)) {
+        if (escribirArchivo(rutaA, datosAlquileres, true)) {
             escribirLn("\nDatos de alquileres guardados correctamente.");
             escribirLn("------------------------------------------------\n");
         } else {
@@ -1130,13 +1117,37 @@ error que se ha producido.*/
 
     public static void caseConfirmarGuardarDatos() {
 
-        if (leerBoolean("¿Desea guardar cambios? S/N.")) {
+        /*if (leerBoolean("¿Desea guardar cambios? S/N.")) {
             caseGuardarDatos();
         } else {
             escribirLn("\n********************ATENCION********************");
         }
         escribirLn("         No se han guardado los datos.");
-        escribirLn("------------------------------------------------");
+        escribirLn("------------------------------------------------");*/
+    }
+
+    public static void crearCopiaSeg() {
+
+        Calendar date = Calendar.getInstance();
+
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+
+        String fecha = sdf.format(date.getTime());
+
+        String ruta = "/copias_seguridad/" + fecha;
+
+        File directorio = new File(ruta);
+
+        if (!directorio.exists()) {
+            if (directorio.mkdirs()) {
+                System.out.println("Directorio creado satisfactoriamente");
+                caseGuardarDatos(ruta);
+            } else {
+                System.out.println("Error al crear directorio");
+            }
+        } else {
+            System.out.println("El directorio ya existe");
+        }
 
     }
 

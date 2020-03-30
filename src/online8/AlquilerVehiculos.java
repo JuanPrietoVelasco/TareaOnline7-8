@@ -25,6 +25,9 @@ import static online8.Alquiler.*;
  */
 public class AlquilerVehiculos {
 
+    //guardar datos al salir cuando haya cambios que guardar
+    public static boolean guardarDatos = true;
+    
     private static final int MAX_VEHICULOS = 50;
     private static final int MAX_CLIENTES = 50;
     private static final int MAX_ALQUILERES = 50;
@@ -418,39 +421,50 @@ lo devuelva si este existe o null en caso contrario.*/
             switch (opcion) {
                 case 1:
                     caseAnadirCliente();
+                    guardarDatos = true;
                     break;
                 case 2:
                     caseBorrarCliente();
+                    guardarDatos = true;
                     break;
                 case 3:
                     caseListarClientes();
                     break;
                 case 4:
                     anadirVehiculo();
+                    guardarDatos = true;
                     break;
                 case 5:
                     caseBorrarVehiculo();
+                    guardarDatos = true;
                     break;
                 case 6:
                     caseListarVehiculos();
                     break;
                 case 7:
                     caseNuevoAlquiler();
+                    guardarDatos = true;
                     break;
                 case 8:
                     cerrarAlquiler();
+                    guardarDatos = true;
                     break;
                 case 9:
                     caseListarAlquileres();
                     break;
                 case 10:
-                    caseGuardarDatos(""); //Al pasarle como parámetro un String vacío, los datos se guardaran en el directorio raíz del proyecto
+                    caseGuardarDatos("");
+                    //Al pasarle por parámetro un String vacío, los datos se guardaran en el directorio raíz del proyecto
+                    guardarDatos = false;
                     break;
                 case 11:
                     crearCopiaSeg();
                     break;
                 case 12:
+                    //guardar datos cuando haya cambios que guardar
+                    if (guardarDatos){
                     caseConfirmarGuardarDatos();
+                    }
                     escribirLn("\n               Fin de programa");
                     escribirLn("------------------------------------------------\n");
                     escribirLn("------------------------------------------------\n");
@@ -496,7 +510,7 @@ y si no existe ningún otro con el mismo DNI o muestre un mensaje con el error q
         } else {
             clientes.add(c);
             escribirLn(c.toString());
-            escribirLn("\nCliente añadido correctamente.");
+            escribirLn("\n      Cliente añadido correctamente.");
             escribirLn("------------------------------------------------\n");
         }
     }
@@ -669,7 +683,8 @@ error que se ha producido.*/
 
                     vehiculos.add(furgoneta);
 
-                    escribirLn("\nVehiculo añadido correctamente.");
+                    escribirLn("\n" + furgoneta.toString());
+                    escribirLn("\nVehiculo furgoneta añadido correctamente.");
                     escribirLn("------------------------------------------------\n");
 
                 } else {
@@ -692,7 +707,8 @@ error que se ha producido.*/
                         Familiar familiar = new Familiar(matricula, marca, modelo, cilindrada, numPuertas, combustible, numPlazas, sillaBebe);
 
                         vehiculos.add(familiar);
-
+                        
+                        escribirLn("\n" + familiar.toString());
                         escribirLn("\nVehículo familiar añadido correctamente.");
                         escribirLn("------------------------------------------------\n");
 
@@ -709,6 +725,7 @@ error que se ha producido.*/
 
                         vehiculos.add(deportivo);
 
+                        escribirLn("\n" + deportivo.toString());
                         escribirLn("\nVehículo deportivo añadido correctamente.");
                         escribirLn("------------------------------------------------\n");
 
@@ -786,7 +803,7 @@ error que se ha producido.*/
         int posCliente;
         int posVehiculo;
         boolean value = false;
-
+        
         dni = (leerCadena("\nIntroduce Dni/Nie del cliente: ")).toUpperCase();
         dniAux = dni;
 
@@ -832,6 +849,7 @@ error que se ha producido.*/
                                         escribirLn("No hay espacio en la memoria para nuevos alquileres.");
                                         escribirLn("------------------------------------------------\n");
                                     } else {
+                                        escribirLn(new Alquiler(clientes.get(posCliente), vehiculos.get(posVehiculo)).toString());
                                         escribirLn("Alquiler registrado correctamente");
                                         escribirLn("------------------------------------------------\n");
                                     }//FIN
@@ -1025,31 +1043,41 @@ error que se ha producido.*/
 
         if (!directorio.exists()) {
             if (directorio.mkdirs()) {
-                System.out.println("Directorio creado satisfactoriamente");
+                escribirLn("    Directorio creado satisfactoriamente");
+                escribirLn("------------------------------------------------\n");
                 caseGuardarDatos(ruta);
             } else {
-                System.out.println("Error al crear directorio");
+                escribirLn("********************ATENCION********************");
+                escribirLn("           Error al crear directorio");
+                escribirLn("------------------------------------------------\n");
             }
         } else {
-            System.out.println("El directorio ya existe");
+            escribirLn("\n     El directorio ya existe");
             
-            borrarFicherosDeDirectorio(directorio); //Con este método borramos todos los ficheros contenidos en el directorio
+            borrarFicherosDeDirectorio(directorio); 
             
             if (directorio.delete()) {
-                System.out.println("El directorio existente ha sido borrado.");
+                escribirLn("   El directorio existente ha sido borrado.");
+                escribirLn("------------------------------------------------\n");
                 if (directorio.mkdirs()) {
                     System.out.println("Directorio creado satisfactoriamente");
                     caseGuardarDatos(ruta);
                 } else {
-                    System.out.println("Error al crear directorio");
+                    escribirLn("********************ATENCION********************");
+                    escribirLn("           Error al crear directorio");
+                    escribirLn("------------------------------------------------\n");
                 }
             }else{
-                System.out.println("Error al intentar borrar el directorio existente.\nCopia de seguridad no creada. ");
+                escribirLn("********************ATENCION********************");
+                escribirLn("Error al intentar borrar el directorio existente.\n"
+                        + "         Copia de seguridad no creada. ");
+                escribirLn("------------------------------------------------\n");
             }
         }
     }
     
     private static void borrarFicherosDeDirectorio(File directorio){
+        //Con este método borramos todos los ficheros contenidos en el directorio
         
         File[] ficheros = directorio.listFiles();
         

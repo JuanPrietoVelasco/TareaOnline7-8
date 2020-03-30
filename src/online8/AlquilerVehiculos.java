@@ -28,12 +28,9 @@ public class AlquilerVehiculos {
     private static final int MAX_VEHICULOS = 50;
     private static final int MAX_CLIENTES = 50;
     private static final int MAX_ALQUILERES = 50;
-    //private static Vehiculo[] vehiculos = new Vehiculo[MAX_VEHICULOS];
     private static ArrayList<Vehiculo> vehiculos = new ArrayList<>();
-    //private static Cliente[] clientes = new Cliente[MAX_CLIENTES];
     private static ArrayList<Cliente> clientes = new ArrayList<>();
     private static ArrayList<Alquiler> alquileres = new ArrayList<>();
-    //private static Alquiler[] alquileres = new Alquiler[MAX_ALQUILERES];
 
     public AlquilerVehiculos() {
     }
@@ -447,7 +444,7 @@ lo devuelva si este existe o null en caso contrario.*/
                     caseListarAlquileres();
                     break;
                 case 10:
-                    caseGuardarDatos("C:\\Users\\juans\\Documents\\NetBeansProjects\\Online8");
+                    caseGuardarDatos(""); //Al pasarle como parámetro un String vacío, los datos se guardaran en el directorio raíz del proyecto
                     break;
                 case 11:
                     crearCopiaSeg();
@@ -481,17 +478,16 @@ lo devuelva si este existe o null en caso contrario.*/
         /*Crea un método anadirCliente que añada un cliente al array de clientes si cabe
 y si no existe ningún otro con el mismo DNI o muestre un mensaje con el error que se ha producido.*/
 
-        int pos = -1;
+        
         boolean encontrado = false;
 
-        if (pos != -1) {
-            for (int i = 0; i < clientes.size(); i++) {
+        
+            for (int i = 0; i < clientes.size() && !encontrado; i++) {
                 if (clientes.get(i).getDni().equalsIgnoreCase(c.getDni())) {
                     encontrado = true;
-                    break;
                 }
             }
-        }
+        
 
         if (encontrado) {
             escribirLn("\n********************ATENCION********************");
@@ -499,7 +495,7 @@ y si no existe ningún otro con el mismo DNI o muestre un mensaje con el error q
             escribirLn("------------------------------------------------\n");
         } else {
             clientes.add(c);
-            escribirLn(clientes.get(pos).toString());
+            escribirLn(c.toString());
             escribirLn("\nCliente añadido correctamente.");
             escribirLn("------------------------------------------------\n");
         }
@@ -898,8 +894,12 @@ error que se ha producido.*/
     public static void caseGuardarDatos(String ruta) {
 
         //Archivo para array clientes.
-        String rutaC = (ruta + "/clientes.txt");
+        String rutaC = (ruta == "") ? "clientes.txt" : ruta + "/clientes.txt";
 
+        /*if(ruta == ""){
+            rutaC = "clientes.txt";
+        }else{
+            rutaC = (ruta + "/clientes.txt");*/
         String datosCliente = "";
 
         //escribirArchivo(String ruta, String datos, boolean sobreescribir)
@@ -921,7 +921,9 @@ error que se ha producido.*/
         }
 
         //Archivo para array vehículos
-        String rutaV = (ruta + "/vehiculos.txt");
+        //String rutaV = (ruta + "/vehiculos.txt");
+        //Archivo para array clientes.
+        String rutaV = (ruta == "") ? "vehiculos.txt" : ruta + "/vehiculos.txt";
 
         String datosVehiculos = "";
 
@@ -972,21 +974,19 @@ error que se ha producido.*/
         }
 
         //Archivo para array alquileres
-        String rutaA = (ruta + "/alquileres.txt");
+        //String rutaA = (ruta + "/alquileres.txt");
+        String rutaA = (ruta == "") ? "alquileres.txt" : ruta + "/alquileres.txt";
+
         String datosAlquileres = "";
 
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 
         for (int i = 0; i < alquileres.size(); i++) {
 
- 
-
-                datosAlquileres += alquileres.get(i).getCliente().getDni() + "#"
-                        + alquileres.get(i).getVehiculo().getMatricula() + "#"
-                        + sdf.format(alquileres.get(i).getFecha().getTime())
-                        + "#" + alquileres.get(i).getDias() + "\n";
-
-            
+            datosAlquileres += alquileres.get(i).getCliente().getDni() + "#"
+                    + alquileres.get(i).getVehiculo().getMatricula() + "#"
+                    + sdf.format(alquileres.get(i).getFecha().getTime())
+                    + "#" + alquileres.get(i).getDias() + "\n";
 
         }
         if (escribirArchivo(rutaA, datosAlquileres, true)) {
@@ -1002,13 +1002,13 @@ error que se ha producido.*/
 
     public static void caseConfirmarGuardarDatos() {
 
-        /*if (leerBoolean("¿Desea guardar cambios? S/N.")) {
-            caseGuardarDatos();
+        if (leerBoolean("¿Desea guardar cambios? S/N.")) {
+            caseGuardarDatos("");
         } else {
             escribirLn("\n********************ATENCION********************");
         }
         escribirLn("         No se han guardado los datos.");
-        escribirLn("------------------------------------------------");*/
+        escribirLn("------------------------------------------------");
     }
 
     public static void crearCopiaSeg() {
@@ -1032,8 +1032,30 @@ error que se ha producido.*/
             }
         } else {
             System.out.println("El directorio ya existe");
+            
+            borrarFicherosDeDirectorio(directorio); //Con este método borramos todos los ficheros contenidos en el directorio
+            
+            if (directorio.delete()) {
+                System.out.println("El directorio existente ha sido borrado.");
+                if (directorio.mkdirs()) {
+                    System.out.println("Directorio creado satisfactoriamente");
+                    caseGuardarDatos(ruta);
+                } else {
+                    System.out.println("Error al crear directorio");
+                }
+            }else{
+                System.out.println("Error al intentar borrar el directorio existente.\nCopia de seguridad no creada. ");
+            }
         }
-
+    }
+    
+    private static void borrarFicherosDeDirectorio(File directorio){
+        
+        File[] ficheros = directorio.listFiles();
+        
+        for(int i=0; i < ficheros.length; i++){
+            ficheros[i].delete();
+        }
     }
 
 }

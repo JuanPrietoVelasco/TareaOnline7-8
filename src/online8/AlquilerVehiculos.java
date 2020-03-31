@@ -1043,7 +1043,8 @@ error que se ha producido.*/
 
         if (!directorio.exists()) {
             if (directorio.mkdirs()) {
-                escribirLn("    Directorio creado satisfactoriamente");
+                escribirLn("\n    Directorio creado satisfactoriamente en");
+                escribirLn("            C:\\copias_seguridad");
                 escribirLn("------------------------------------------------\n");
                 caseGuardarDatos(ruta);
             } else {

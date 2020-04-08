@@ -14,6 +14,8 @@ import java.util.Scanner;
  */
 public class ES {
 
+    public static Scanner sc;
+
     //leerEntero():int 
     public static int leerEntero() {
 
@@ -277,28 +279,28 @@ public class ES {
         Scanner sc = new Scanner(System.in);
         //Igualamos el Si a true y el No a false
         boolean resul = true;
-   
+
         do {
             System.out.println(msg);
 
             opcion = sc.nextLine();
 
             if (opcion.equalsIgnoreCase("S")) {
-                
+
                 resul = true;
             } else {
                 if (opcion.equalsIgnoreCase("N")) {
-                    
+
                     resul = false;
                 }
             }
-            
-            if(!opcion.equalsIgnoreCase("S") && !opcion.equalsIgnoreCase("N")){
+
+            if (!opcion.equalsIgnoreCase("S") && !opcion.equalsIgnoreCase("N")) {
                 escribir("Debes introducir una S o una N!");
             }
-            
+
         } while (!opcion.equalsIgnoreCase("S") && !opcion.equalsIgnoreCase("N"));
-        
+
         return resul;
     }
 
@@ -363,89 +365,67 @@ public class ES {
     }
 
     public static String leerCadena(String msg, int longitud) {
-        
+
         Scanner sc = new Scanner(System.in);
-        
+
         String cadena;
-        do{
+        do {
             System.out.println(msg);
             cadena = sc.next();
-            
-            if(msg.length() != longitud){
+
+            if (msg.length() != longitud) {
                 System.out.println("Longitud de cadena errónea.");
             }
-            
-        }while(msg.length() != longitud);
-     
+
+        } while (msg.length() != longitud);
+
         return cadena;
     }
 
+    //Corregido
     public static boolean escribirArchivo(String ruta, String datos, boolean sobreescribir) {
-        
 
-        boolean exito = false, sobreescritura = !sobreescribir;
-        
-        
-        //filewriter nos permite crear y escribir en ficheros
+        boolean exito = false; //sobreescritura = !sobreescribir;
+
         FileWriter fichero = null;
-        //PrintWriter nos permite agregarle funcionalidad de escritura a anterior
-        PrintWriter fw = null;
 
         try {
-            fichero = new FileWriter(ruta, sobreescritura);
-            fw = new PrintWriter(fichero);
+            fichero = new FileWriter(ruta, !sobreescribir);
 
-            fw.println(datos);
+            fichero.write(datos);
+            fichero.close();
             exito = true;
 
         } catch (Exception e) {
             e.getMessage();
-        }finally{
-            try{
-                //cerramos el archivo y tiene que ser en un try catch
-                fichero.close();
-            }catch(Exception e2){
-                e2.getMessage();
-            }
-        }
-        //true=se ha realizado la escritura correctamente
-        return exito;
-    }
-    
-    public static String leerArchivo(String ruta){
-        
-        String resultado ="";
-        
-        File archivo = null;
-        FileReader fr = null;
-        BufferedReader br = null;
-        
-        try{
-            // Abrir el fichero y creación de BufferedReader para disponer del método readLine()).
-            
-            archivo = new File(ruta);
-            fr = new FileReader(archivo);
-            br = new BufferedReader(fr);
-            
-            //Lectura del archivo
-            
-            String linea;
-            while((linea = br.readLine())!=null){
-                resultado+=linea+"\n";
-            }
-            
-        }catch(Exception e){
-            e.getMessage();
-        }finally{
-            try{
-                fr.close();
-            }catch(Exception e2){
-                e2.getMessage();
-            }
         }
 
-        return resultado;
+        return exito;
+    }
+
+    //Corregido
+    public static String leerArchivo(String ruta) throws FileNotFoundException {
+
+        String resultado = "";
+
+        File fichero = new File(ruta);
+
+        if (fichero.exists()) {
+
+            sc = new Scanner(fichero);
+
+            //Leemos línea a línea el fichero
+            while (sc.hasNextLine()) {
+                String linea = sc.nextLine();
+                resultado += linea + "\n";
+
+            }
+
+        }
+
         
+        return resultado;
+
     }
 
 }

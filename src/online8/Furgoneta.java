@@ -28,6 +28,14 @@ public class Furgoneta extends Mercancias {
     public Tamanio getTamanio() {
         return tamanio;
     }
+    
+    //Corregido
+
+    @Override
+    public String escribirFichero() {
+        return super.escribirFichero() + "#" +this.refrigerado + "#" + this.tamanio + "\n";
+    }
+    
 
     @Override
     public String toString() {

@@ -44,6 +44,14 @@ public final class Familiar extends Turismo{
         this.sillaBebe = sillaBebe;
     }
 
+    //Corregido
+    @Override
+    public String escribirFichero() {
+        return super.escribirFichero() + "#" + this.numPlazas + "#" + this.sillaBebe + "\n"; //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    
+
     @Override
     public String toString() {
         

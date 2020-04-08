@@ -6,19 +6,33 @@
 package online8;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.Scanner;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.Result;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import static online8.ES.*;
 import static online8.Utilidades.*;
 import static online8.Cliente.*;
 import static online8.Enumerados.*;
 import static online8.Mercancias.*;
 import static online8.Alquiler.*;
+import org.w3c.dom.DOMImplementation;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Text;
 
 /**
  * @author juan
@@ -27,10 +41,7 @@ public class AlquilerVehiculos {
 
     //guardar datos al salir cuando haya cambios que guardar
     public static boolean guardarDatos = true;
-    
-    private static final int MAX_VEHICULOS = 50;
-    private static final int MAX_CLIENTES = 50;
-    private static final int MAX_ALQUILERES = 50;
+
     private static ArrayList<Vehiculo> vehiculos = new ArrayList<>();
     private static ArrayList<Cliente> clientes = new ArrayList<>();
     private static ArrayList<Alquiler> alquileres = new ArrayList<>();
@@ -43,7 +54,7 @@ public class AlquilerVehiculos {
         Cliente c = null;
 
         if ((Utilidades.comprobarDni(dni))) {
-            for (int i = 0; i < MAX_CLIENTES; i++) {
+            for (int i = 0; i < clientes.size(); i++) {
                 //si la posicion array no es nula y coincide el dni existente lo devuelve
                 if (clientes.get(i).getDni().equalsIgnoreCase(dni)) {
                     c = clientes.get(i);
@@ -212,7 +223,7 @@ lo devuelva si este existe o null en caso contrario.*/
 
     }
 
-    public static void leerDatos() {
+    public static void leerDatos() throws FileNotFoundException {
 
         int tipoVehiculo = 0; //Esta variable la utilizaremos para posteriormente saber qué tipo de vehiculo almacenamos en el array de alquileres
 
@@ -232,6 +243,8 @@ lo devuelva si este existe o null en caso contrario.*/
                 clientes.add(nuevoCliente);
 
             }
+
+            Collections.sort(clientes);
 
         }
 
@@ -389,7 +402,7 @@ lo devuelva si este existe o null en caso contrario.*/
     //
 //
     //---------------------------------------MAIN------------------------------------------------------//  
-    public static void main(String[] args) {
+    public static void main(String[] args) throws FileNotFoundException {
 
         //Cargamos los datos desde los archivos.
         leerDatos();
@@ -414,35 +427,36 @@ lo devuelva si este existe o null en caso contrario.*/
             escribirLn("1. Añadir cliente.\n2. Borrar cliente.\n3. Listar clientes.\n"
                     + "4. Añadir vehiculo.\n5. Borrar vehiculo.\n6. Listar vehiculos.\n"
                     + "7. Nuevo alquiler.\n8. Cerrar alquiler.\n9. Listar alquileres.\n"
-                    + "10. Guardar datos.\n11. Crear copia de seguridad.\n12. Salir");
+                    + "10. Guardar datos.\n11. Crear copia de seguridad.\n12. Guardar info en XML.\n"
+                    + "13. Leer info de XML.\n14. Salir");
 
             opcion = leerEntero("\nIntroduce opción: ");
 
             switch (opcion) {
                 case 1:
-                    caseAnadirCliente();
+                    anadirCliente();
                     guardarDatos = true;
                     break;
                 case 2:
-                    caseBorrarCliente();
+                    borrarCliente();
                     guardarDatos = true;
                     break;
                 case 3:
-                    caseListarClientes();
+                    listarClientes();
                     break;
                 case 4:
                     anadirVehiculo();
                     guardarDatos = true;
                     break;
                 case 5:
-                    caseBorrarVehiculo();
+                    borrarVehiculo();
                     guardarDatos = true;
                     break;
                 case 6:
-                    caseListarVehiculos();
+                    listarVehiculos();
                     break;
                 case 7:
-                    caseNuevoAlquiler();
+                    nuevoAlquiler();
                     guardarDatos = true;
                     break;
                 case 8:
@@ -450,10 +464,10 @@ lo devuelva si este existe o null en caso contrario.*/
                     guardarDatos = true;
                     break;
                 case 9:
-                    caseListarAlquileres();
+                    listarAlquileres();
                     break;
                 case 10:
-                    caseGuardarDatos("");
+                    guardarDatos("");
                     //Al pasarle por parámetro un String vacío, los datos se guardaran en el directorio raíz del proyecto
                     guardarDatos = false;
                     break;
@@ -461,9 +475,14 @@ lo devuelva si este existe o null en caso contrario.*/
                     crearCopiaSeg();
                     break;
                 case 12:
+                    guardarDatosXML();
+                    break;
+                case 13:
+                    break;
+                case 14:
                     //guardar datos cuando haya cambios que guardar
-                    if (guardarDatos){
-                    caseConfirmarGuardarDatos();
+                    if (guardarDatos) {
+                        confirmarGuardarDatos();
                     }
                     escribirLn("\n               Fin de programa");
                     escribirLn("------------------------------------------------\n");
@@ -478,7 +497,7 @@ lo devuelva si este existe o null en caso contrario.*/
 
             }
 
-        } while (opcion != 12);
+        } while (opcion != 14);
 
     }
 //    
@@ -492,16 +511,13 @@ lo devuelva si este existe o null en caso contrario.*/
         /*Crea un método anadirCliente que añada un cliente al array de clientes si cabe
 y si no existe ningún otro con el mismo DNI o muestre un mensaje con el error que se ha producido.*/
 
-        
         boolean encontrado = false;
 
-        
-            for (int i = 0; i < clientes.size() && !encontrado; i++) {
-                if (clientes.get(i).getDni().equalsIgnoreCase(c.getDni())) {
-                    encontrado = true;
-                }
+        for (int i = 0; i < clientes.size() && !encontrado; i++) {
+            if (clientes.get(i).getDni().equalsIgnoreCase(c.getDni())) {
+                encontrado = true;
             }
-        
+        }
 
         if (encontrado) {
             escribirLn("\n********************ATENCION********************");
@@ -510,12 +526,15 @@ y si no existe ningún otro con el mismo DNI o muestre un mensaje con el error q
         } else {
             clientes.add(c);
             escribirLn(c.toString());
+
+            Collections.sort(clientes); //Ordenamos el array una vez introducido un nuevo cliente.
+
             escribirLn("\n      Cliente añadido correctamente.");
             escribirLn("------------------------------------------------\n");
         }
     }
 
-    public static void caseAnadirCliente() {
+    public static void anadirCliente() {
 
         //Utilizamos dniAux parahacer las comprobaciones en el caso de que se trate de un NIE
         String dniAux;
@@ -572,29 +591,46 @@ y si no existe ningún otro con el mismo DNI o muestre un mensaje con el error q
     public static void borrarCliente(String dni) {
         /*Crea un método borrarCliente que elimine un cliente, dado su DNI.*/
 
+        boolean procesado = false;
         int pos = -1;
 
         for (int i = 0; i < clientes.size(); i++) {
             if (clientes.get(i).getDni().equalsIgnoreCase(dni)) {
 
-                vehiculos.remove(vehiculos.get(i));
-
                 pos = i;
+
+                //Primero buscamos ese cliente en alquileres para ver si tiene un alquiler activo
+                for (int j = 0; j < alquileres.size() && !procesado; j++) {
+
+                    if (alquileres.get(j).getCliente().getDni().equalsIgnoreCase(dni)) {
+
+                        if (!alquileres.get(i).getVehiculo().getDisponible()) {
+                            System.out.println("El cliente tiene un alquiler activo. Debe cerrar primero el alquiler asociado al cliente para borrarlo.");
+                            procesado = true;
+                        } else {
+                            clientes.remove(clientes.get(i));
+                            System.out.println("Cliente eliminado correctamente.");
+                            procesado = true;
+                        }
+                    }
+
+                }
 
             }
         }
-        if (pos == -1) {
-            escribirLn("\n********************ATENCION********************");
-            escribirLn("            Dni/Nie no registrado.");
-            escribirLn("------------------------------------------------\n");
-        } else {
 
-            escribirLn("\n               Cliente borrado.");
-            escribirLn("------------------------------------------------\n");
+        if (pos != -1 && !procesado) {
+            clientes.remove(clientes.get(pos));
+            System.out.println("Cliente sin alquileres activos eliminado correctamente.");
         }
+
+        if (pos == -1) {
+            System.out.println("Cliente no registrado");
+        }
+
     }
 
-    public static void caseBorrarCliente() {
+    public static void borrarCliente() {
 
         String dni = leerCadena("\nIntroduce Dni/Nie de cliente a borrar: ").toUpperCase();
         if (comprobarDni(dni)) {
@@ -619,7 +655,7 @@ y si no existe ningún otro con el mismo DNI o muestre un mensaje con el error q
         }
     }
 
-    public static void caseListarClientes() {
+    public static void listarClientes() {
 
         if (clientes.isEmpty()) {
             escribirLn("\n********************ATENCION********************");
@@ -707,7 +743,7 @@ error que se ha producido.*/
                         Familiar familiar = new Familiar(matricula, marca, modelo, cilindrada, numPuertas, combustible, numPlazas, sillaBebe);
 
                         vehiculos.add(familiar);
-                        
+
                         escribirLn("\n" + familiar.toString());
                         escribirLn("\nVehículo familiar añadido correctamente.");
                         escribirLn("------------------------------------------------\n");
@@ -768,7 +804,7 @@ error que se ha producido.*/
         }
     }
 
-    public static void caseBorrarVehiculo() {
+    public static void borrarVehiculo() {
 
         String matricula = (leerCadena("\nIntroduce matrícula del vehiculo a borrar: ")).toUpperCase();
         comprobarMatricula(matricula);
@@ -782,7 +818,7 @@ error que se ha producido.*/
         }
     }
 
-    public static void caseListarVehiculos() {
+    public static void listarVehiculos() {
         boolean vacio = vehiculos.isEmpty();
 
         if (vacio) {
@@ -796,14 +832,15 @@ error que se ha producido.*/
         }
     }
 
-    public static void caseNuevoAlquiler() {
+    public static void nuevoAlquiler() {
         String dni;
         String dniAux;
         String matricula;
         int posCliente;
         int posVehiculo;
         boolean value = false;
-        
+        boolean mat_ok = false;
+
         dni = (leerCadena("\nIntroduce Dni/Nie del cliente: ")).toUpperCase();
         dniAux = dni;
 
@@ -822,12 +859,15 @@ error que se ha producido.*/
 
                 posCliente = buscarCliente(dni);
 
-                while (!value) {
-                    if (posCliente != -1) {
+                if (posCliente != -1) {
+
+                    while (!mat_ok) {
 
                         matricula = leerCadena("\nIntroduce matricula del vehículo: ").toUpperCase();
 
                         if (comprobarMatricula(matricula)) {
+
+                            mat_ok = true;
 
                             posVehiculo = buscarVehiculo(matricula);
 
@@ -835,24 +875,14 @@ error que se ha producido.*/
 
                                 if (vehiculos.get(posVehiculo).getDisponible() == true) {
 
-                                    for (int i = 0; i < alquileres.size() && !value; i++) {
+                                    vehiculos.get(posVehiculo).setDisponible(false);
 
-                                        vehiculos.get(posVehiculo).setDisponible(false);
-                                        alquileres.add(new Alquiler(clientes.get(posCliente), vehiculos.get(posVehiculo)));
-                                        System.out.println(alquileres.get(i));
-                                        value = true;
+                                    Alquiler nuevoAl = new Alquiler(clientes.get(posCliente), vehiculos.get(posVehiculo));
+                                    alquileres.add(nuevoAl);
+                                    System.out.println(nuevoAl);
 
-                                    }
-
-                                    if (!value) {
-                                        escribirLn("\n********************ATENCION********************");
-                                        escribirLn("No hay espacio en la memoria para nuevos alquileres.");
-                                        escribirLn("------------------------------------------------\n");
-                                    } else {
-                                        escribirLn(new Alquiler(clientes.get(posCliente), vehiculos.get(posVehiculo)).toString());
-                                        escribirLn("Alquiler registrado correctamente");
-                                        escribirLn("------------------------------------------------\n");
-                                    }//FIN
+                                    escribirLn("Alquiler registrado correctamente");
+                                    escribirLn("------------------------------------------------\n");
 
                                 } else {
                                     escribirLn("\n********************ATENCION********************");
@@ -872,11 +902,12 @@ error que se ha producido.*/
                             escribirLn("------------------------------------------------\n");
                         }
 
-                    } else {
-                        escribirLn("\n********************ATENCION********************");
-                        escribirLn("No hay ningún cliente registro con el Dni/Nie proporciado");
-                        escribirLn("------------------------------------------------\n");
-                    }
+                    }// while mat_ok
+
+                } else {
+                    escribirLn("\n********************ATENCION********************");
+                    escribirLn("No hay ningún cliente registrado con ese Dni/Nie.");
+                    escribirLn("------------------------------------------------\n");
                 }
 
             } else {
@@ -893,23 +924,21 @@ error que se ha producido.*/
 
     }
 
-    public static void caseListarAlquileres() {
-        boolean vacio = true;
+    public static void listarAlquileres() {
 
-        for (int i = 0; i < alquileres.size(); i++) {
-
-            escribirLn(alquileres.get(i).toString());
-            vacio = false;
-
-        }
-        if (vacio) {
+        if (alquileres.isEmpty()) {
             escribirLn("\n********************ATENCION********************");
             escribirLn("            No existen alquileres.");
             escribirLn("------------------------------------------------\n");
+        } else {
+            for (Alquiler a : alquileres) {
+                System.out.println(a);
+            }
         }
+
     }
 
-    public static void caseGuardarDatos(String ruta) {
+    public static void guardarDatos(String ruta) {
 
         //Archivo para array clientes.
         String rutaC = (ruta == "") ? "clientes.txt" : ruta + "/clientes.txt";
@@ -923,9 +952,8 @@ error que se ha producido.*/
         //escribirArchivo(String ruta, String datos, boolean sobreescribir)
         for (int i = 0; i < clientes.size(); i++) {
 
-            datosCliente += clientes.get(i).getDni() + "#" + clientes.get(i).getNombre()
-                    + "#" + clientes.get(i).getDireccion() + "#" + clientes.get(i).getLocalidad()
-                    + "#" + clientes.get(i).getCodigoPostal() + "\n";
+            //Corregido
+            datosCliente += clientes.get(i).escribirFichero();
 
         }
 
@@ -951,10 +979,8 @@ error que se ha producido.*/
 
                 Deportivo aux = (Deportivo) vehiculos.get(i);
 
-                datosVehiculos += "Deportivo#" + aux.getMatricula() + "#" + aux.getMarca() + "#"
-                        + aux.getModelo() + "#" + aux.getCilindrada() + "#" + aux.getDisponible() + "#"
-                        + aux.getNumeroPuertas() + "#" + aux.getCombustible() + "#" + aux.getCambio()
-                        + "#" + aux.getDescapotable() + "\n";
+                //Corregido
+                datosVehiculos += "Deportivo#" + aux.escribirFichero();
 
             }
 
@@ -962,10 +988,8 @@ error que se ha producido.*/
 
                 Familiar aux = (Familiar) vehiculos.get(i);
 
-                datosVehiculos += "Familiar#" + aux.getMatricula() + "#" + aux.getMarca() + "#"
-                        + aux.getModelo() + "#" + aux.getCilindrada() + "#" + aux.getDisponible() + "#"
-                        + aux.getNumeroPuertas() + "#" + aux.getCombustible() + "#" + aux.getNumPlazas()
-                        + "#" + aux.getSillaBebe() + "\n";
+                //Corregido
+                datosVehiculos += "Familiar#" + aux.escribirFichero();
 
             }
 
@@ -973,10 +997,8 @@ error que se ha producido.*/
 
                 Furgoneta aux = (Furgoneta) vehiculos.get(i);
 
-                datosVehiculos += "Furgoneta#" + aux.getMatricula() + "#" + aux.getMarca() + "#"
-                        + aux.getModelo() + "#" + aux.getCilindrada() + "#" + aux.getDisponible() + "#"
-                        + aux.getPma() + "#" + aux.getVolumen() + "#" + aux.getRefrigerado() + "#"
-                        + aux.getTamanio() + "\n";
+                //Corregido
+                datosVehiculos += "Furgoneta#" + aux.escribirFichero();
 
             }
 
@@ -1018,10 +1040,10 @@ error que se ha producido.*/
 
     }
 
-    public static void caseConfirmarGuardarDatos() {
+    public static void confirmarGuardarDatos() {
 
         if (leerBoolean("¿Desea guardar cambios? S/N.")) {
-            caseGuardarDatos("");
+            guardarDatos("");
         } else {
             escribirLn("\n********************ATENCION********************");
         }
@@ -1046,7 +1068,7 @@ error que se ha producido.*/
                 escribirLn("\n    Directorio creado satisfactoriamente en");
                 escribirLn("            C:\\copias_seguridad");
                 escribirLn("------------------------------------------------\n");
-                caseGuardarDatos(ruta);
+                guardarDatos(ruta);
             } else {
                 escribirLn("********************ATENCION********************");
                 escribirLn("           Error al crear directorio");
@@ -1054,21 +1076,21 @@ error que se ha producido.*/
             }
         } else {
             escribirLn("\n     El directorio ya existe");
-            
-            borrarFicherosDeDirectorio(directorio); 
-            
+
+            borrarFicherosDeDirectorio(directorio);
+
             if (directorio.delete()) {
                 escribirLn("   El directorio existente ha sido borrado.");
                 escribirLn("------------------------------------------------\n");
                 if (directorio.mkdirs()) {
                     System.out.println("Directorio creado satisfactoriamente");
-                    caseGuardarDatos(ruta);
+                    guardarDatos(ruta);
                 } else {
                     escribirLn("********************ATENCION********************");
                     escribirLn("           Error al crear directorio");
                     escribirLn("------------------------------------------------\n");
                 }
-            }else{
+            } else {
                 escribirLn("********************ATENCION********************");
                 escribirLn("Error al intentar borrar el directorio existente.\n"
                         + "         Copia de seguridad no creada. ");
@@ -1076,15 +1098,102 @@ error que se ha producido.*/
             }
         }
     }
-    
-    private static void borrarFicherosDeDirectorio(File directorio){
+
+    private static void borrarFicherosDeDirectorio(File directorio) {
         //Con este método borramos todos los ficheros contenidos en el directorio
-        
+
         File[] ficheros = directorio.listFiles();
-        
-        for(int i=0; i < ficheros.length; i++){
+
+        for (int i = 0; i < ficheros.length; i++) {
             ficheros[i].delete();
         }
+    }
+
+    private static void guardarDatosXML() {
+
+        String nombreFichero = "clientes.xml";
+
+        String nodo = "Cliente";
+
+        try {
+
+            //Creamos una instancia de DocumentBuilderFactory
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+
+            //Creamos el documentBuilder
+            DocumentBuilder builder = factory.newDocumentBuilder();
+
+            //Crear un DOMImplementation
+            DOMImplementation implementation = builder.getDOMImplementation();
+
+            //Creamos el documento con un elemento raíz
+            Document documento = implementation.createDocument(null, nombreFichero, null);
+
+            //Indicamos la versión del documento
+            documento.setXmlVersion("1.0");
+
+            Element clientes_XML = documento.createElement("Clientes");
+
+            for (int i = 0; i < clientes.size(); i++) {
+                String valor;
+
+                Element cliente_ = documento.createElement(nodo);
+
+                // Insertamos el DNI del cliente
+                Element elemento = documento.createElement("dni");
+                Text textoElemento = documento.createTextNode(clientes.get(i).getDni());
+                elemento.appendChild(textoElemento);
+                cliente_.appendChild(elemento);
+
+                // Insertamos el nombre del cliente
+                elemento = documento.createElement("nombre");
+                textoElemento = documento.createTextNode(clientes.get(i).getNombre());
+                elemento.appendChild(textoElemento);
+                cliente_.appendChild(elemento);
+
+                // Insertamos la direccion del cliente
+                elemento = documento.createElement("direccion");
+                textoElemento = documento.createTextNode(clientes.get(i).getDireccion());
+                elemento.appendChild(textoElemento);
+                cliente_.appendChild(elemento);
+
+                // Insertamos la localidad del cliente
+                elemento = documento.createElement("localidad");
+                textoElemento = documento.createTextNode(clientes.get(i).getLocalidad());
+                elemento.appendChild(textoElemento);
+                cliente_.appendChild(elemento);
+
+                // Insertamos el código postal del cliente
+                elemento = documento.createElement("cod_postal");
+                textoElemento = documento.createTextNode(clientes.get(i).getCodigoPostal());
+                elemento.appendChild(textoElemento);
+                cliente_.appendChild(elemento);
+
+                //Añadimos al elemento Clientes el elemento Cliente
+                clientes_XML.appendChild(cliente_);
+
+            }
+
+            //Añadimos el elemento raíz al documento
+            documento.getDocumentElement().appendChild(clientes_XML);
+
+            //Asociar el source con el Document
+            Source fuente = new DOMSource(documento);
+
+            //Creamos el Result, indicandole el fichero a crear
+            Result resultado = new StreamResult(new File(nombreFichero));
+
+            //Creamos un transformer para crear finalmente el archivo XML
+            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+
+            transformer.transform(fuente, resultado);
+
+            System.out.println("Guardado XML Correctamente");
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
     }
 
 }

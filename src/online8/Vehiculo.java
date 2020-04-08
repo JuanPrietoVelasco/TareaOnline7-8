@@ -59,6 +59,11 @@ public abstract class Vehiculo {
        return disponible;
     }
     
+    //Corregido
+    public String escribirFichero(){
+        return this.matricula+"#"+this.marca+"#"+this.modelo+"#"+this.cilindrada + "#" + this.disponible;
+    }
+    
     @Override
     public String toString(){
         

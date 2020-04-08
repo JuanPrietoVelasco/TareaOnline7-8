@@ -9,13 +9,14 @@ package online8;
  *
  * @author juans
  */
-public class Cliente {
+public class Cliente implements Comparable<Cliente>{
     
     private String dni;
     private String nombre;
     private String direccion;
     private String localidad;
     private String codigoPostal;
+    
     
     public Cliente(String dni, String nombre, String direccion, String localidad, String codigo){
         this.dni = dni;
@@ -54,9 +55,34 @@ public class Cliente {
         return this.codigoPostal;
     }
     
+    //Corregido
+    public String escribirFichero(){
+        
+        return this.dni+"#"+this.nombre+"#"+this.direccion+"#"+this.localidad+"#"+this.codigoPostal+"\n";
+    }
+    
    
     @Override
     public String toString(){
         return "\nDni/Nie: "+this.dni +"\t\tNombre:  "+ this.nombre +"\t\tDirección:  "+ this.direccion +"\t\tLocalidad: "+ this.localidad +"\t\tCódigo postas: "+ this.codigoPostal;
     }
+
+    @Override
+    public int compareTo(Cliente c) {
+        
+        if(this.dni.compareToIgnoreCase(c.getDni()) > 0){
+            return 1;
+        }else if(this.dni.compareToIgnoreCase(c.getDni()) < 0){
+            return -1;
+        }
+        return 0;
+     
+    }
+    
+    
 }
+
+    
+
+    
+

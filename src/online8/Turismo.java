@@ -11,15 +11,15 @@ import online8.Enumerados.Combustible;
  *
  * @author juans
  */
-public abstract class Turismo extends Vehiculo{
-    
+public abstract class Turismo extends Vehiculo {
+
     protected int numPuertas;
     protected Combustible combustible;
-    
-    public Turismo(String matricula, String marca, String modelo, int cilindrada,int numPuertas, Combustible combustible) {
+
+    public Turismo(String matricula, String marca, String modelo, int cilindrada, int numPuertas, Combustible combustible) {
         super(matricula, marca, modelo, cilindrada);
-        this.numPuertas=numPuertas;
-        this.combustible=combustible;           
+        this.numPuertas = numPuertas;
+        this.combustible = combustible;
     }
 
     public int getNumPuertas() {
@@ -37,11 +37,15 @@ public abstract class Turismo extends Vehiculo{
     public void setCombustible(Combustible combustible) {
         this.combustible = combustible;
     }
-    
-    
+
+    //Corregido
+    @Override
+    public String escribirFichero() {
+        return super.escribirFichero() + "#" + this.numPuertas + "#" + this.combustible;
+    }
 
     @Override
     public String toString() {
-        return super.toString() + "\t\tNúmero de puertas: " + this.numPuertas + "\t\tCombustible: " + this.combustible; 
+        return super.toString() + "\t\tNúmero de puertas: " + this.numPuertas + "\t\tCombustible: " + this.combustible;
     }
 }

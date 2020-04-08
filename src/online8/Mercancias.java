@@ -9,19 +9,21 @@ package online8;
  *
  * @author juans
  */
-public abstract class Mercancias extends Vehiculo{
+public abstract class Mercancias extends Vehiculo {
+
     private int pma;
     private int volumen;
+
     public Mercancias(String matricula, String marca, String modelo, int cilindrada, int pma, int volumen) {
         super(matricula, marca, modelo, cilindrada);
-        this.pma=pma;
-        this.volumen=volumen;   
+        this.pma = pma;
+        this.volumen = volumen;
     }
-    
-    public Mercancias(Vehiculo vehiculo, int pma, int volumen){
+
+    public Mercancias(Vehiculo vehiculo, int pma, int volumen) {
         super(vehiculo.getMatricula(), vehiculo.getMarca(), vehiculo.getModelo(), vehiculo.getCilindrada()); //Corregido
-        this.pma=pma;
-        this.volumen=volumen;
+        this.pma = pma;
+        this.volumen = volumen;
     }
 
     public int getPma() {
@@ -32,9 +34,15 @@ public abstract class Mercancias extends Vehiculo{
         return volumen;
     }
 
+    //Corregido
+    @Override
+    public String escribirFichero() {
+        return super.escribirFichero() + "#" + this.pma + "#" + this.volumen;
+    }
+
     @Override
     public String toString() {
-        return super.toString() + "\t\tPMA: " + pma + "\t\tVolumen: " + volumen; 
+        return super.toString() + "\t\tPMA: " + pma + "\t\tVolumen: " + volumen;
     }
-    
+
 }

@@ -45,6 +45,13 @@ public final class Deportivo extends Turismo {
     public int getNumeroPuertas(){
         return super.getNumPuertas();
     }
+
+    @Override
+    public String escribirFichero() {
+        return super.escribirFichero()+"#"+this.cambio+"#"+this.descapotable+"\n";
+    }
+    
+    
     
    
     @Override

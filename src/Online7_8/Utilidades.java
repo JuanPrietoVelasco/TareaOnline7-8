@@ -29,7 +29,7 @@ public class Utilidades {
     }
 
     public static boolean comprobarDni(String dni) {
-        Pattern p = Pattern.compile("([XYZ]{1}[0-9]{7}[TRWAGMYFPDXBNJZSQVHLCKE])|([0-9]{8}[TRWAGMYFPDXBNJZSQVHLCKE])");
+        Pattern p = Pattern.compile("([XYZ]{1}[0-9]{7})|([0-9]{8})");
         Matcher m = p.matcher(dni);
         return m.matches();
         

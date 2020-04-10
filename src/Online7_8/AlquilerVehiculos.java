@@ -371,13 +371,13 @@ lo devuelva si este existe o null en caso contrario.*/
                 String matricula = datos[1];
                 String fecha = datos[2];
                 int dias = Integer.parseInt(datos[3]);
-                
-                if(buscarCliente(dni) != -1){
-                    
+
+                if (buscarCliente(dni) != -1) {
+
                     Cliente nuevoCliente = clientes.get(buscarCliente(dni));
-                    
-                    if(buscarVehiculo(matricula) != -1){
-                        
+
+                    if (buscarVehiculo(matricula) != -1) {
+
                         Vehiculo nuevoVehiculo = vehiculos.get(buscarVehiculo(matricula));
 
                         String[] datosFecha = fecha.split("[/ :]+");
@@ -395,7 +395,7 @@ lo devuelva si este existe o null en caso contrario.*/
                         nuevoAlquiler.setDias(dias);
 
                         alquileres.add(nuevoAlquiler);
-                        
+
                     }
                 }
             }
@@ -481,7 +481,8 @@ lo devuelva si este existe o null en caso contrario.*/
                     crearCopiaSeg();
                     break;
                 case 12:
-                    guardarDatosXML();
+                    //guardarDatosXMLClientes();
+                    guardarDatosXMLVehiculos();
                     break;
                 case 13:
                     break;
@@ -513,7 +514,7 @@ lo devuelva si este existe o null en caso contrario.*/
 //
 //    
 
-    public static void anadirCliente(Cliente c) {
+    public static void anadirClienteArrayList(Cliente c) {
         /*Crea un método anadirCliente que añada un cliente al array de clientes si cabe
 y si no existe ningún otro con el mismo DNI o muestre un mensaje con el error que se ha producido.*/
 
@@ -543,10 +544,10 @@ y si no existe ningún otro con el mismo DNI o muestre un mensaje con el error q
     public static void anadirCliente() {
 
         //Utilizamos dniAux parahacer las comprobaciones en el caso de que se trate de un NIE
-        String dniAux;
         String dni = leerCadena("\nIntroduce Dni/Nie de cliente: ").toUpperCase();
         boolean value = false;
-        dniAux = dni;
+        String dniAux = dni;
+
         if (comprobarDni(dni)) {
             //nie = dni;
             if (dniAux.substring(0, 1).equalsIgnoreCase("X")
@@ -554,40 +555,31 @@ y si no existe ningún otro con el mismo DNI o muestre un mensaje con el error q
                     || dniAux.substring(0, 1).equalsIgnoreCase("Z")) {
                 dniAux = pasarNieADni(dniAux);
             }
+
             //Comparamos la letra del dni/nie con la letra calculada con el método calcular letra
-            if (dniAux.substring(8, 9).equalsIgnoreCase(calcularLetraDni(dniAux.substring(0, 8)))) {
-                //escribirLn("DNI correcto");
-                String nombre = leerCadena("\nIntroduce nombre de cliente: ").toUpperCase();
-                String direccion = leerCadena("\nIntroduce dirección de cliente: ").toUpperCase();
-                String localidad = leerCadena("\nIntroduce localidad de cliente: ").toUpperCase();
+            dni += calcularLetraDni(dniAux);
+            //escribirLn("DNI correcto");
+            String nombre = leerCadena("\nIntroduce nombre de cliente: ").toUpperCase();
+            String direccion = leerCadena("\nIntroduce dirección de cliente: ").toUpperCase();
+            String localidad = leerCadena("\nIntroduce localidad de cliente: ").toUpperCase();
 
-                //utilizar un while para volver a pedir el cp si fuera erroneo
-                while (!value) {
-                    String cod_postal = leerCadena("\nIntroduce el código postal de cliente: ");
-                    if (comprobarCodigoPostal(cod_postal)) {
-                        value = true;
-                        anadirCliente(new Cliente(dni, nombre, direccion, localidad, cod_postal));
+            //utilizar un while para volver a pedir el cp si fuera erroneo
+            while (!value) {
+                String cod_postal = leerCadena("\nIntroduce el código postal de cliente: ");
+                if (comprobarCodigoPostal(cod_postal)) {
+                    value = true;
+                    anadirClienteArrayList(new Cliente(dni, nombre, direccion, localidad, cod_postal));
 
-                    } else {
-                        escribirLn("\n********************ATENCION********************");
-                        escribirLn("          Código postal incorrecto.");
-                        escribirLn("------------------------------------------------");
-                    }
+                } else {
+                    escribirLn("\n********************ATENCION********************");
+                    escribirLn("          Código postal incorrecto.");
+                    escribirLn("------------------------------------------------");
                 }
-
-            } else {
-                escribirLn("\n********************ATENCION********************");
-                escribirLn("Letra de Dni/Nie incorrecta.  Al documento " + dni.substring(0, 8) + " le corresponde la letra: " + calcularLetraDni(dniAux));
-                escribirLn("Escoja de nuevo una opción del menu principal.");
-                escribirLn("------------------------------------------------\n");
             }
 
         } else {
             escribirLn("\n********************ATENCION********************");
-            escribirLn("Formato de Dni/Nie incorrecto.  Debe introducir una letra valida a continuación de:\n"
-                    + "- 8 números para un Dni."
-                    + "- X,Y o Z y 7 números para un Nie."
-                    + "\nLetras válidas: T,R,W,A,G,M,Y,F,P,D,X,B,N,J,Z,S,Q,V,H,L,C,K o E"
+            escribirLn("Formato de Dni/Nie incorrecto."
                     + "\nEscoja de nuevo una opción del menu principal.");
             escribirLn("------------------------------------------------\n");
         }
@@ -1134,11 +1126,11 @@ error que se ha producido.*/
         }
     }
 
-    private static void guardarDatosXML() {
+    private static void guardarDatosXMLClientes() {
 
         String nombreFichero = "clientes.xml";
 
-        String nodo = "Cliente";
+        String nodo = "Clientes";
 
         try {
 
@@ -1152,17 +1144,17 @@ error que se ha producido.*/
             DOMImplementation implementation = builder.getDOMImplementation();
 
             //Creamos el documento con un elemento raíz
-            Document documento = implementation.createDocument(null, nombreFichero, null);
+            Document documento = implementation.createDocument(null, nodo, null);
 
             //Indicamos la versión del documento
             documento.setXmlVersion("1.0");
 
-            Element clientes_XML = documento.createElement("Clientes");
+            //Element clientes_XML = documento.createElement("Clientes");
 
             for (int i = 0; i < clientes.size(); i++) {
-                String valor;
+               
 
-                Element cliente_ = documento.createElement(nodo);
+                Element cliente_ = documento.createElement("Cliente");
 
                 // Insertamos el DNI del cliente
                 Element elemento = documento.createElement("dni");
@@ -1195,13 +1187,152 @@ error que se ha producido.*/
                 cliente_.appendChild(elemento);
 
                 //Añadimos al elemento Clientes el elemento Cliente
-                clientes_XML.appendChild(cliente_);
+                //clientes_XML.appendChild(cliente_);
+                documento.getDocumentElement().appendChild(cliente_);
 
             }
 
             //Añadimos el elemento raíz al documento
-            documento.getDocumentElement().appendChild(clientes_XML);
+            //documento.getDocumentElement().appendChild(clientes_XML);
 
+            //Asociar el source con el Document
+            Source fuente = new DOMSource(documento);
+
+            //Creamos el Result, indicandole el fichero a crear
+            Result resultado = new StreamResult(new File(nombreFichero));
+
+            //Creamos un transformer para crear finalmente el archivo XML
+            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+
+            transformer.transform(fuente, resultado);
+
+            System.out.println("Guardado XML Correctamente");
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+    }
+    
+    
+    private static void guardarDatosXMLVehiculos() {
+
+        String nombreFichero = "vehiculos.xml";
+
+        String nodo = "Vehiculos";
+        
+
+        try {
+
+            //Creamos una instancia de DocumentBuilderFactory
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+
+            //Creamos el documentBuilder
+            DocumentBuilder builder = factory.newDocumentBuilder();
+
+            //Crear un DOMImplementation
+            DOMImplementation implementation = builder.getDOMImplementation();
+
+            //Creamos el documento con un elemento raíz
+            Document documento = implementation.createDocument(null, nodo, null);
+
+            //Indicamos la versión del documento
+            documento.setXmlVersion("1.0");
+
+            
+
+            for (int i = 0; i < vehiculos.size(); i++) {
+                
+
+                Element vehiculo_ = documento.createElement("Vehiculo");
+                
+                if (vehiculos.get(i) instanceof Deportivo) {
+
+                Deportivo aux = (Deportivo) vehiculos.get(i);
+
+                //Insertamos el Tipo de vehiculo
+                Element elemento = documento.createElement("tipovehiculo");
+                Text textoElemento = documento.createTextNode("DEPORTIVO");
+                elemento.appendChild(textoElemento);
+                vehiculo_.appendChild(elemento);
+                
+                    
+                
+                //Insertamos la matricula
+                elemento = documento.createElement("matricula");
+                textoElemento = documento.createTextNode(aux.getMatricula());
+                elemento.appendChild(textoElemento);
+                vehiculo_.appendChild(elemento);
+                
+                    
+                
+                //Insertamos la marca
+                elemento = documento.createElement("marca");
+                textoElemento = documento.createTextNode(aux.getMarca());
+                elemento.appendChild(textoElemento);
+                vehiculo_.appendChild(elemento);
+                
+               
+                
+                //Insertamos el modelo
+                elemento = documento.createElement("modelo");
+                textoElemento = documento.createTextNode(aux.getModelo());
+                elemento.appendChild(textoElemento);
+                vehiculo_.appendChild(elemento);
+                
+               
+                
+                //Insertamos la cilindrada
+                elemento = documento.createElement("cilindrada");
+                textoElemento = documento.createTextNode(String.valueOf(aux.getCilindrada()));
+                elemento.appendChild(textoElemento);
+                vehiculo_.appendChild(elemento);
+                
+                
+                
+                //Insertamos el numero de puertas
+                elemento = documento.createElement("num_puertas");
+                textoElemento = documento.createTextNode(String.valueOf(aux.getNumPuertas()));
+                elemento.appendChild(textoElemento);
+                vehiculo_.appendChild(elemento);
+                
+                
+                
+                //Insertamos el combustible
+                elemento = documento.createElement("combustible");
+                textoElemento = documento.createTextNode(String.valueOf(aux.getCombustible()));
+                elemento.appendChild(textoElemento);
+                vehiculo_.appendChild(elemento);
+                
+               
+                
+                //Insertamos el cambio
+                elemento = documento.createElement("cambio");
+                textoElemento = documento.createTextNode(String.valueOf(aux.getCambio()));
+                elemento.appendChild(textoElemento);
+                vehiculo_.appendChild(elemento);
+                
+                System.out.println("Cambio");
+                
+                //Insertamos el descapotable
+                elemento = documento.createElement("descapotable");
+                textoElemento = documento.createTextNode(String.valueOf(aux.getDescapotable()));
+                elemento.appendChild(textoElemento);
+                vehiculo_.appendChild(elemento);
+                
+                
+                
+                documento.getDocumentElement().appendChild(vehiculo_);
+                
+                }else{
+                    System.out.println("No entro en el bucle");
+                }
+                
+                
+
+            }
+
+            
             //Asociar el source con el Document
             Source fuente = new DOMSource(documento);
 

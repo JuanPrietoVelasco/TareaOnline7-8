@@ -371,27 +371,33 @@ lo devuelva si este existe o null en caso contrario.*/
                 String matricula = datos[1];
                 String fecha = datos[2];
                 int dias = Integer.parseInt(datos[3]);
+                
+                if(buscarCliente(dni) != -1){
+                    
+                    Cliente nuevoCliente = clientes.get(buscarCliente(dni));
+                    
+                    if(buscarVehiculo(matricula) != -1){
+                        
+                        Vehiculo nuevoVehiculo = vehiculos.get(buscarVehiculo(matricula));
 
-                Cliente nuevoCliente = clientes.get(buscarCliente(dni));
+                        String[] datosFecha = fecha.split("[/ :]+");
 
-                Vehiculo nuevoVehiculo = vehiculos.get(buscarVehiculo(matricula));
+                        int day = Integer.parseInt(datosFecha[0]);
+                        int month = Integer.parseInt(datosFecha[1]);
+                        int year = Integer.parseInt(datosFecha[2]);
+                        int hour = Integer.parseInt(datosFecha[3]);
+                        int minute = Integer.parseInt(datosFecha[4]);
 
-                String[] datosFecha = fecha.split("[/ :]+");
+                        Calendar fechaAlquiler = new GregorianCalendar(year, month - 1, day, hour, minute);
 
-                int day = Integer.parseInt(datosFecha[0]);
-                int month = Integer.parseInt(datosFecha[1]);
-                int year = Integer.parseInt(datosFecha[2]);
-                int hour = Integer.parseInt(datosFecha[3]);
-                int minute = Integer.parseInt(datosFecha[4]);
+                        Alquiler nuevoAlquiler = new Alquiler(nuevoCliente, nuevoVehiculo);
+                        nuevoAlquiler.setFecha(fechaAlquiler);
+                        nuevoAlquiler.setDias(dias);
 
-                Calendar fechaAlquiler = new GregorianCalendar(year, month - 1, day, hour, minute);
-
-                Alquiler nuevoAlquiler = new Alquiler(nuevoCliente, nuevoVehiculo);
-                nuevoAlquiler.setFecha(fechaAlquiler);
-                nuevoAlquiler.setDias(dias);
-
-                alquileres.add(nuevoAlquiler);
-
+                        alquileres.add(nuevoAlquiler);
+                        
+                    }
+                }
             }
 
         }

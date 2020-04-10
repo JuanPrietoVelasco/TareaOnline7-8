@@ -64,7 +64,7 @@ public class Cliente implements Comparable<Cliente>{
    
     @Override
     public String toString(){
-        return "\nDni/Nie: "+this.dni +"\t\tNombre:  "+ this.nombre +"\t\tDirección:  "+ this.direccion +"\t\tLocalidad: "+ this.localidad +"\t\tCódigo postas: "+ this.codigoPostal;
+        return "\nDni/Nie: "+this.dni +"\t\tNombre:  "+ this.nombre +"\t\tDirección:  "+ this.direccion +"\t\tLocalidad: "+ this.localidad +"\t\tCódigo postal: "+ this.codigoPostal;
     }
 
     @Override

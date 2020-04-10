@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package online8;
+package Online7_8;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -23,12 +23,12 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import static online8.ES.*;
-import static online8.Utilidades.*;
-import static online8.Cliente.*;
-import static online8.Enumerados.*;
-import static online8.Mercancias.*;
-import static online8.Alquiler.*;
+import static Online7_8.ES.*;
+import static Online7_8.Utilidades.*;
+import static Online7_8.Cliente.*;
+import static Online7_8.Enumerados.*;
+import static Online7_8.Mercancias.*;
+import static Online7_8.Alquiler.*;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -605,11 +605,15 @@ y si no existe ningún otro con el mismo DNI o muestre un mensaje con el error q
                     if (alquileres.get(j).getCliente().getDni().equalsIgnoreCase(dni)) {
 
                         if (!alquileres.get(i).getVehiculo().getDisponible()) {
-                            System.out.println("El cliente tiene un alquiler activo. Debe cerrar primero el alquiler asociado al cliente para borrarlo.");
+                            escribirLn("\n********************ATENCION********************");
+                            escribirLn("  El cliente tiene un alquiler activo. Debe cerrar\n"
+                                    + "         primero el alquiler asociado.");
+                            escribirLn("------------------------------------------------\n");
                             procesado = true;
                         } else {
                             clientes.remove(clientes.get(i));
-                            System.out.println("Cliente eliminado correctamente.");
+                            escribirLn("\n        Cliente eliminado correctamente.");
+                            escribirLn("------------------------------------------------\n");
                             procesado = true;
                         }
                     }
@@ -621,11 +625,14 @@ y si no existe ningún otro con el mismo DNI o muestre un mensaje con el error q
 
         if (pos != -1 && !procesado) {
             clientes.remove(clientes.get(pos));
-            System.out.println("Cliente sin alquileres activos eliminado correctamente.");
+            escribirLn("\n       Cliente borrado correctamente.");
+            escribirLn("------------------------------------------------\n");
         }
 
         if (pos == -1) {
-            System.out.println("Cliente no registrado");
+            escribirLn("\n********************ATENCION********************");
+            escribirLn("            Cliente no registrado");
+            escribirLn("------------------------------------------------\n");
         }
 
     }
@@ -785,22 +792,34 @@ error que se ha producido.*/
         /* Crea un método borrarVehiculo que borre un vehiculo, dada su matrícula, del
     array de vehiculos. */
 
+        boolean procesado = false;
         int pos = -1;
-        for (int i = 0; i < vehiculos.size() && pos == -1; i++) {
+
+        for (int i = 0; i < vehiculos.size(); i++) {
             if (vehiculos.get(i).getMatricula().equalsIgnoreCase(m)) {
-                //Creamos un vehículo para compararlo con el que queremos borrar del ArrayList
-                Vehiculo v = vehiculos.get(i);
-                vehiculos.remove(v);
+
                 pos = i;
+
+                //Primero buscamos ese cliente en alquileres para ver si tiene un alquiler activo
+                for (int j = 0; j < alquileres.size() && !procesado; j++) {
+
+                    if (alquileres.get(j).getVehiculo().getMatricula().equalsIgnoreCase(m)) {
+
+                        if (!alquileres.get(i).getVehiculo().getDisponible()) {
+                            escribirLn("\n********************ATENCION********************");
+                            escribirLn("El vehiculo tiene un alquiler activo. Debe cerrar\n"
+                                    + "        primero el alquiler asociado.");
+                            escribirLn("------------------------------------------------\n");
+                            procesado = true;
+                        } else {
+                            vehiculos.remove(vehiculos.get(i));
+                            escribirLn("\n        Vehiculo eliminado correctamente.");
+                            escribirLn("------------------------------------------------\n");
+                            procesado = true;
+                        }
+                    }
+                }
             }
-        }
-        if (pos == -1) {
-            escribirLn("\n********************ATENCION********************");
-            escribirLn("           Matricula no registrada.");
-            escribirLn("------------------------------------------------\n");
-        } else {
-            escribirLn("\nVehiculo borrado correctamente.");
-            escribirLn("------------------------------------------------\n");
         }
     }
 

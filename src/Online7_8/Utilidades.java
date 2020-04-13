@@ -52,8 +52,6 @@ public class Utilidades {
         return letra;
     }
     
-
-
     public static String pasarNieADni(String nie) {
         char letra = nie.charAt(0);
         switch (letra) {
@@ -65,5 +63,12 @@ public class Utilidades {
                 nie = nie.replace("Z", "2");
         }
         return nie;
+    }
+    
+    public static boolean comprobarFecha(String fecha){
+        
+        Pattern p = Pattern.compile("\\d{2}-\\d{2}-\\d{4}");
+        Matcher m = p.matcher(fecha);
+        return m.matches();
     }
 }

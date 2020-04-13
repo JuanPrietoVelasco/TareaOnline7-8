@@ -7,32 +7,18 @@ package Online7_8;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.Scanner;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.Result;
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import static Online7_8.ES.*;
 import static Online7_8.Utilidades.*;
-import static Online7_8.Cliente.*;
 import static Online7_8.Enumerados.*;
-import static Online7_8.Mercancias.*;
-import static Online7_8.Alquiler.*;
-import org.w3c.dom.DOMImplementation;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Text;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 
 /**
  * @author juan
@@ -40,7 +26,7 @@ import org.w3c.dom.Text;
 public class AlquilerVehiculos {
 
     //guardar datos al salir cuando haya cambios que guardar
-    public static boolean guardarDatos = true;
+    public static boolean guardarDatos = false;
 
     private static ArrayList<Vehiculo> vehiculos = new ArrayList<>();
     private static ArrayList<Cliente> clientes = new ArrayList<>();
@@ -223,186 +209,7 @@ lo devuelva si este existe o null en caso contrario.*/
 
     }
 
-    public static void leerDatos() throws FileNotFoundException {
-
-        int tipoVehiculo = 0; //Esta variable la utilizaremos para posteriormente saber qué tipo de vehiculo almacenamos en el array de alquileres
-
-        //CLIENTES
-        String clientesTxt = leerArchivo("clientes.txt");
-
-        if (!clientesTxt.isEmpty()) {
-
-            String[] datosClientes = clientesTxt.split("\n");
-
-            for (int i = 0; i < datosClientes.length; i++) {
-
-                String[] datos = datosClientes[i].split("#");
-
-                Cliente nuevoCliente = new Cliente(datos[0], datos[1], datos[2], datos[3], datos[4]);
-
-                clientes.add(nuevoCliente);
-
-            }
-
-            Collections.sort(clientes);
-
-        }
-
-        //VEHICULOS
-        String vehiculosTxt = leerArchivo("vehiculos.txt");
-
-        if (!vehiculosTxt.isEmpty()) {
-
-            String[] datosVehiculos = vehiculosTxt.split("\n");
-
-            for (int i = 0; i < datosVehiculos.length; i++) {
-
-                String[] datos = datosVehiculos[i].split("#");
-
-                //Vehiculo vehiculo = null;
-                String matricula = datos[1];
-                String marca = datos[2];
-                String modelo = datos[3];
-                int cilindrada = Integer.parseInt(datos[4]);
-                boolean disponible = (datos[5].equalsIgnoreCase("true")) ? true : false;
-
-                switch (datos[0]) {
-
-                    case "Furgoneta":
-                        tipoVehiculo = 1;
-                        //int pma, int volumen, boolean refrigerado, Tamanio tamanio
-                        int pma = Integer.parseInt(datos[6]);
-                        int volumen = Integer.parseInt(datos[7]);
-                        boolean refrigerado = (datos[8].equalsIgnoreCase("true")) ? true : false;
-                        Tamanio tamanio = null;
-
-                        if (datos[9].equalsIgnoreCase("GRANDE")) {
-                            tamanio = Enumerados.Tamanio.GRANDE;
-                        } else if (datos[9].equalsIgnoreCase("MEDIANO")) {
-                            tamanio = Enumerados.Tamanio.MEDIANO;
-                        } else {
-                            tamanio = Enumerados.Tamanio.PEQUENIO;
-                        }
-
-                        vehiculos.add(new Furgoneta(matricula, marca, modelo, cilindrada,
-                                pma, volumen, refrigerado, tamanio));
-                        vehiculos.get(i).setDisponible(disponible);
-                        break;
-
-                    case "Deportivo":
-
-                        tipoVehiculo = 2;
-
-                        //protected int numPuertas;
-                        // protected Combustible combustible;
-                        // private CajaCambios cambio;
-                        //  private boolean descapotable;
-                        int numPuertas = Integer.parseInt(datos[6]);
-                        Combustible combustible = null;
-
-                        if (datos[7].equalsIgnoreCase("GASOLINA")) {
-                            combustible = Enumerados.Combustible.GASOLINA;
-                        } else if (datos[7].equalsIgnoreCase("DIESEL")) {
-                            combustible = Enumerados.Combustible.DIESEL;
-                        } else if (datos[7].equalsIgnoreCase("HIBRIDO")) {
-                            combustible = Enumerados.Combustible.HIBRIDO;
-                        } else {
-                            combustible = Enumerados.Combustible.ELECTRICO;
-                        }
-
-                        CajaCambios cambio = null;
-
-                        if (datos[8].equalsIgnoreCase("AUTOMATICO")) {
-                            cambio = Enumerados.CajaCambios.AUTOMATICO;
-                        } else {
-                            cambio = Enumerados.CajaCambios.MANUAL;
-                        }
-
-                        boolean descapotable = (datos[9].equalsIgnoreCase("true")) ? true : false;
-
-                        vehiculos.add(new Deportivo(matricula, marca, modelo, cilindrada, numPuertas,
-                                combustible, cambio, descapotable));
-                        vehiculos.get(i).setDisponible(disponible);
-                        break;
-
-                    case "Familiar":
-
-                        tipoVehiculo = 3;
-
-                        int numPuertasFami = Integer.parseInt(datos[6]);
-                        Combustible combustibleFami = null;
-
-                        if (datos[7].equalsIgnoreCase("GASOLINA")) {
-                            combustibleFami = Enumerados.Combustible.GASOLINA;
-                        } else if (datos[7].equalsIgnoreCase("DIESEL")) {
-                            combustibleFami = Enumerados.Combustible.DIESEL;
-                        } else if (datos[7].equalsIgnoreCase("HIBRIDO")) {
-                            combustibleFami = Enumerados.Combustible.HIBRIDO;
-                        } else {
-                            combustibleFami = Enumerados.Combustible.ELECTRICO;
-                        }
-
-                        //int numPlazas, boolean sillaBebe
-                        int numPlazas = Integer.parseInt(datos[8]);
-                        boolean sillaBebe = (datos[9].equalsIgnoreCase("true")) ? true : false;
-
-                        vehiculos.add(new Familiar(matricula, marca, modelo, cilindrada, numPuertasFami,
-                                combustibleFami, numPlazas, sillaBebe));
-                        vehiculos.get(i).setDisponible(disponible);
-                        break;
-                }
-
-            }
-
-        }
-        //ALQUILERES
-
-        String alquileresTxt = leerArchivo("alquileres.txt");
-
-        if (!alquileresTxt.isEmpty()) {
-
-            String[] datosAlquileres = alquileresTxt.split("\n");
-
-            for (int i = 0; i < datosAlquileres.length; i++) {
-
-                String[] datos = datosAlquileres[i].split("#");
-
-                String dni = datos[0];
-                String matricula = datos[1];
-                String fecha = datos[2];
-                int dias = Integer.parseInt(datos[3]);
-
-                if (buscarCliente(dni) != -1) {
-
-                    Cliente nuevoCliente = clientes.get(buscarCliente(dni));
-
-                    if (buscarVehiculo(matricula) != -1) {
-
-                        Vehiculo nuevoVehiculo = vehiculos.get(buscarVehiculo(matricula));
-
-                        String[] datosFecha = fecha.split("[/ :]+");
-
-                        int day = Integer.parseInt(datosFecha[0]);
-                        int month = Integer.parseInt(datosFecha[1]);
-                        int year = Integer.parseInt(datosFecha[2]);
-                        int hour = Integer.parseInt(datosFecha[3]);
-                        int minute = Integer.parseInt(datosFecha[4]);
-
-                        Calendar fechaAlquiler = new GregorianCalendar(year, month - 1, day, hour, minute);
-
-                        Alquiler nuevoAlquiler = new Alquiler(nuevoCliente, nuevoVehiculo);
-                        nuevoAlquiler.setFecha(fechaAlquiler);
-                        nuevoAlquiler.setDias(dias);
-
-                        alquileres.add(nuevoAlquiler);
-
-                    }
-                }
-            }
-
-        }
-        System.out.println("\nDatos cargados desde los archivos correctamente.");
-    }
+    
 
     //
     //
@@ -411,7 +218,7 @@ lo devuelva si este existe o null en caso contrario.*/
     public static void main(String[] args) throws FileNotFoundException {
 
         //Cargamos los datos desde los archivos.
-        leerDatos();
+        leerDatos("");
 
         int opcion = 0;
         Scanner sc = new Scanner(System.in);
@@ -421,9 +228,7 @@ lo devuelva si este existe o null en caso contrario.*/
         escribirLn("Información al usuario:\n- Una vez elegida una opción del menu, en el caso de haber escogido erroneamente,\n"
                 + "  podrás volver al menu dando un dato con formato erroneo en el primer paso de la opción.\n"
                 + "- Si va a introducir un alquiler, se recomienda listar previamente con las opciones 3,6 y 9\n"
-                + "  los clientes, vehículos y alquileres ya guardados para poder consultar datos.\n"
-                + "- Si la letra del Dni introducido al añadir un cliente, siento una letra válida\n"
-                + "  no es la que corresponde al mismo, el programa le proporcionará la correcta.\n"
+                + "  los clientes, vehículos y alquileres ya guardados para poder consultar datos.\n"       
                 + "- Cuando listemos los alquileres, el dato 'Disponible' nos indicará: si es Si que\n"
                 + "  se trata de un alquiler cerrado; si es No que es un alquiler activo.");
 
@@ -433,8 +238,7 @@ lo devuelva si este existe o null en caso contrario.*/
             escribirLn("1. Añadir cliente.\n2. Borrar cliente.\n3. Listar clientes.\n"
                     + "4. Añadir vehiculo.\n5. Borrar vehiculo.\n6. Listar vehiculos.\n"
                     + "7. Nuevo alquiler.\n8. Cerrar alquiler.\n9. Listar alquileres.\n"
-                    + "10. Guardar datos.\n11. Crear copia de seguridad.\n12. Guardar info en XML.\n"
-                    + "13. Leer info de XML.\n14. Salir");
+                    + "10. Guardar datos.\n11. Crear copia de seguridad.\n12. Cargar copia de seguridad.\n13.Salir"); 
 
             opcion = leerEntero("\nIntroduce opción: ");
 
@@ -479,14 +283,12 @@ lo devuelva si este existe o null en caso contrario.*/
                     break;
                 case 11:
                     crearCopiaSeg();
-                    break;
+                    break; 
                 case 12:
-                    //guardarDatosXMLClientes();
-                    guardarDatosXMLVehiculos();
+                    cargarCopiaSeg();
+                    guardarDatos = true;
                     break;
                 case 13:
-                    break;
-                case 14:
                     //guardar datos cuando haya cambios que guardar
                     if (guardarDatos) {
                         confirmarGuardarDatos();
@@ -504,7 +306,7 @@ lo devuelva si este existe o null en caso contrario.*/
 
             }
 
-        } while (opcion != 14);
+        } while (opcion != 13);
 
     }
 //    
@@ -544,7 +346,7 @@ y si no existe ningún otro con el mismo DNI o muestre un mensaje con el error q
     public static void anadirCliente() {
 
         //Utilizamos dniAux parahacer las comprobaciones en el caso de que se trate de un NIE
-        String dni = leerCadena("\nIntroduce Dni/Nie de cliente: ").toUpperCase();
+        String dni = leerCadena("\nIntroduce Dni/Nie sin la letra final: ").toUpperCase();
         boolean value = false;
         String dniAux = dni;
 
@@ -678,13 +480,9 @@ y si no existe ningún otro con el mismo DNI o muestre un mensaje con el error q
 cabe y no existe ningún otro con la misma matrícula o muestre un mensaje con el
 error que se ha producido.*/
 
-        //pos para guardar primera posición nula(vacia)
         int pos = -1;
         boolean encontrado = false;
 
-        //existe espacio en el array, ha dado toda la vuelta y pos no ha cambiado. Ahora comprobamos que no este ya guarda la matrícula
-        //Si 0 esta vacia, pos = 0 por ser null, pero 0 aún no tine vehículo para poder comparar matrícula.(pos!=0)
-        //Existe espacio vacío. Comenzamos a pedir información al usuario.
         String matricula = (leerCadena("\nIntroduce matrícula del vehículo: ")).toUpperCase();
 
         if (comprobarMatricula(matricula)) {
@@ -692,9 +490,7 @@ error que se ha producido.*/
             for (int i = 0; i < vehiculos.size() && !encontrado; i++) {
 
                 if (vehiculos.get(i).getMatricula().equalsIgnoreCase(matricula)) {
-                    // escribirLn(vehiculos[i].getMatricula());
                     encontrado = true;
-
                 }
             }
 
@@ -919,7 +715,7 @@ error que se ha producido.*/
                             escribirLn("------------------------------------------------\n");
                         }
 
-                    }// while mat_ok
+                    }// fin while mat_ok
 
                 } else {
                     escribirLn("\n********************ATENCION********************");
@@ -960,13 +756,8 @@ error que se ha producido.*/
         //Archivo para array clientes.
         String rutaC = (ruta == "") ? "clientes.txt" : ruta + "/clientes.txt";
 
-        /*if(ruta == ""){
-            rutaC = "clientes.txt";
-        }else{
-            rutaC = (ruta + "/clientes.txt");*/
         String datosCliente = "";
-
-        //escribirArchivo(String ruta, String datos, boolean sobreescribir)
+    
         for (int i = 0; i < clientes.size(); i++) {
 
             //Corregido
@@ -984,8 +775,7 @@ error que se ha producido.*/
         }
 
         //Archivo para array vehículos
-        //String rutaV = (ruta + "/vehiculos.txt");
-        //Archivo para array clientes.
+       
         String rutaV = (ruta == "") ? "vehiculos.txt" : ruta + "/vehiculos.txt";
 
         String datosVehiculos = "";
@@ -1031,7 +821,6 @@ error que se ha producido.*/
         }
 
         //Archivo para array alquileres
-        //String rutaA = (ruta + "/alquileres.txt");
         String rutaA = (ruta == "") ? "alquileres.txt" : ruta + "/alquileres.txt";
 
         String datosAlquileres = "";
@@ -1055,6 +844,191 @@ error que se ha producido.*/
             escribirLn("------------------------------------------------\n");
         }
 
+    }
+    
+    public static void leerDatos(String ruta) throws FileNotFoundException {
+
+        int tipoVehiculo = 0; //Esta variable la utilizaremos para posteriormente saber qué tipo de vehiculo almacenamos en el array de alquileres
+
+        String rutaCliente = (ruta.isEmpty()) ? "clientes.txt" : ruta + "\\clientes.txt";
+        //CLIENTES
+        String clientesTxt = leerArchivo(rutaCliente);
+
+        if (!clientesTxt.isEmpty()) {
+
+            String[] datosClientes = clientesTxt.split("\n");
+
+            for (int i = 0; i < datosClientes.length; i++) {
+
+                String[] datos = datosClientes[i].split("#");
+
+                Cliente nuevoCliente = new Cliente(datos[0], datos[1], datos[2], datos[3], datos[4]);
+
+                clientes.add(nuevoCliente);
+
+            }
+
+            Collections.sort(clientes);
+
+        }
+
+        //VEHICULOS
+        String rutaVehiculo = (ruta.isEmpty()) ? "vehiculos.txt" : ruta + "\\vehiculos.txt";
+
+        String vehiculosTxt = leerArchivo(rutaVehiculo);
+
+        if (!vehiculosTxt.isEmpty()) {
+
+            String[] datosVehiculos = vehiculosTxt.split("\n");
+
+            for (int i = 0; i < datosVehiculos.length; i++) {
+
+                String[] datos = datosVehiculos[i].split("#");
+
+                //Vehiculo vehiculo = null;
+                String matricula = datos[1];
+                String marca = datos[2];
+                String modelo = datos[3];
+                int cilindrada = Integer.parseInt(datos[4]);
+                boolean disponible = (datos[5].equalsIgnoreCase("true")) ? true : false;
+
+                switch (datos[0]) {
+
+                    case "Furgoneta":
+                        tipoVehiculo = 1;
+                        //int pma, int volumen, boolean refrigerado, Tamanio tamanio
+                        int pma = Integer.parseInt(datos[6]);
+                        int volumen = Integer.parseInt(datos[7]);
+                        boolean refrigerado = (datos[8].equalsIgnoreCase("true")) ? true : false;
+                        Tamanio tamanio = null;
+
+                        if (datos[9].equalsIgnoreCase("GRANDE")) {
+                            tamanio = Enumerados.Tamanio.GRANDE;
+                        } else if (datos[9].equalsIgnoreCase("MEDIANO")) {
+                            tamanio = Enumerados.Tamanio.MEDIANO;
+                        } else {
+                            tamanio = Enumerados.Tamanio.PEQUENIO;
+                        }
+
+                        vehiculos.add(new Furgoneta(matricula, marca, modelo, cilindrada,
+                                pma, volumen, refrigerado, tamanio));
+                        vehiculos.get(i).setDisponible(disponible);
+                        break;
+
+                    case "Deportivo":
+
+                        tipoVehiculo = 2;
+
+                        //protected int numPuertas;
+                        // protected Combustible combustible;
+                        // private CajaCambios cambio;
+                        //  private boolean descapotable;
+                        int numPuertas = Integer.parseInt(datos[6]);
+                        Combustible combustible = null;
+
+                        if (datos[7].equalsIgnoreCase("GASOLINA")) {
+                            combustible = Enumerados.Combustible.GASOLINA;
+                        } else if (datos[7].equalsIgnoreCase("DIESEL")) {
+                            combustible = Enumerados.Combustible.DIESEL;
+                        } else if (datos[7].equalsIgnoreCase("HIBRIDO")) {
+                            combustible = Enumerados.Combustible.HIBRIDO;
+                        } else {
+                            combustible = Enumerados.Combustible.ELECTRICO;
+                        }
+
+                        CajaCambios cambio = null;
+
+                        if (datos[8].equalsIgnoreCase("AUTOMATICO")) {
+                            cambio = Enumerados.CajaCambios.AUTOMATICO;
+                        } else {
+                            cambio = Enumerados.CajaCambios.MANUAL;
+                        }
+
+                        boolean descapotable = (datos[9].equalsIgnoreCase("true")) ? true : false;
+
+                        vehiculos.add(new Deportivo(matricula, marca, modelo, cilindrada, numPuertas,
+                                combustible, cambio, descapotable));
+                        vehiculos.get(i).setDisponible(disponible);
+                        break;
+
+                    case "Familiar":
+
+                        tipoVehiculo = 3;
+
+                        int numPuertasFami = Integer.parseInt(datos[6]);
+                        Combustible combustibleFami = null;
+
+                        if (datos[7].equalsIgnoreCase("GASOLINA")) {
+                            combustibleFami = Enumerados.Combustible.GASOLINA;
+                        } else if (datos[7].equalsIgnoreCase("DIESEL")) {
+                            combustibleFami = Enumerados.Combustible.DIESEL;
+                        } else if (datos[7].equalsIgnoreCase("HIBRIDO")) {
+                            combustibleFami = Enumerados.Combustible.HIBRIDO;
+                        } else {
+                            combustibleFami = Enumerados.Combustible.ELECTRICO;
+                        }
+
+                        //int numPlazas, boolean sillaBebe
+                        int numPlazas = Integer.parseInt(datos[8]);
+                        boolean sillaBebe = (datos[9].equalsIgnoreCase("true")) ? true : false;
+
+                        vehiculos.add(new Familiar(matricula, marca, modelo, cilindrada, numPuertasFami,
+                                combustibleFami, numPlazas, sillaBebe));
+                        vehiculos.get(i).setDisponible(disponible);
+                        break;
+                }
+
+            }
+
+        }
+        //ALQUILERES
+
+        String rutaAlquileres = (ruta.isEmpty()) ? "alquileres.txt" : ruta + "\\alquileres.txt";
+        String alquileresTxt = leerArchivo(rutaAlquileres);
+
+        if (!alquileresTxt.isEmpty()) {
+
+            String[] datosAlquileres = alquileresTxt.split("\n");
+
+            for (int i = 0; i < datosAlquileres.length; i++) {
+
+                String[] datos = datosAlquileres[i].split("#");
+
+                String dni = datos[0];
+                String matricula = datos[1];
+                String fecha = datos[2];
+                int dias = Integer.parseInt(datos[3]);
+
+                if (buscarCliente(dni) != -1) {
+
+                    Cliente nuevoCliente = clientes.get(buscarCliente(dni));
+
+                    if (buscarVehiculo(matricula) != -1) {
+
+                        Vehiculo nuevoVehiculo = vehiculos.get(buscarVehiculo(matricula));
+
+                        String[] datosFecha = fecha.split("[/ :]+");
+
+                        int day = Integer.parseInt(datosFecha[0]);
+                        int month = Integer.parseInt(datosFecha[1]);
+                        int year = Integer.parseInt(datosFecha[2]);
+                        int hour = Integer.parseInt(datosFecha[3]);
+                        int minute = Integer.parseInt(datosFecha[4]);
+
+                        Calendar fechaAlquiler = new GregorianCalendar(year, month - 1, day, hour, minute);
+
+                        Alquiler nuevoAlquiler = new Alquiler(nuevoCliente, nuevoVehiculo);
+                        nuevoAlquiler.setFecha(fechaAlquiler);
+                        nuevoAlquiler.setDias(dias);
+
+                        alquileres.add(nuevoAlquiler);
+
+                    }
+                }
+            }
+
+        }
+        System.out.println("\nDatos cargados desde los archivos correctamente.");
     }
 
     public static void confirmarGuardarDatos() {
@@ -1115,6 +1089,45 @@ error que se ha producido.*/
             }
         }
     }
+    
+     public static void cargarCopiaSeg() {
+
+        String fecha = leerCadena("Introduce fecha de copia a cargar en formato dd-mm-aaaa: ");
+
+        if (comprobarFecha(fecha)) {
+
+            String ruta = "/copias_seguridad/" + fecha;
+
+            File directorio = new File(ruta);
+
+            if (!directorio.exists()) {
+
+                escribirLn("\n********************ATENCION********************");
+                escribirLn("No existe copia de seguridad de la fecha especificada");
+                escribirLn("------------------------------------------------\n");
+            } else {
+
+                clientes.clear();
+                vehiculos.clear();
+                alquileres.clear();
+
+                try {
+                    leerDatos(ruta);
+                } catch (FileNotFoundException ex) {
+                    Logger.getLogger(AlquilerVehiculos.class.getName()).log(Level.SEVERE, null, ex);
+                }
+
+                escribirLn("          Cargada copia de seguridad.\n");
+                escribirLn("------------------------------------------------\n");
+
+            }
+        }else {
+        escribirLn("\n********************ATENCION********************");
+        escribirLn(  "         Formato de fecha incorrecto.");
+        escribirLn(" Escoja de nuevo una opción del menu principal.");
+        escribirLn("------------------------------------------------\n");
+        }
+    }
 
     private static void borrarFicherosDeDirectorio(File directorio) {
         //Con este método borramos todos los ficheros contenidos en el directorio
@@ -1124,232 +1137,6 @@ error que se ha producido.*/
         for (int i = 0; i < ficheros.length; i++) {
             ficheros[i].delete();
         }
-    }
-
-    private static void guardarDatosXMLClientes() {
-
-        String nombreFichero = "clientes.xml";
-
-        String nodo = "Clientes";
-
-        try {
-
-            //Creamos una instancia de DocumentBuilderFactory
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-
-            //Creamos el documentBuilder
-            DocumentBuilder builder = factory.newDocumentBuilder();
-
-            //Crear un DOMImplementation
-            DOMImplementation implementation = builder.getDOMImplementation();
-
-            //Creamos el documento con un elemento raíz
-            Document documento = implementation.createDocument(null, nodo, null);
-
-            //Indicamos la versión del documento
-            documento.setXmlVersion("1.0");
-
-            //Element clientes_XML = documento.createElement("Clientes");
-
-            for (int i = 0; i < clientes.size(); i++) {
-               
-
-                Element cliente_ = documento.createElement("Cliente");
-
-                // Insertamos el DNI del cliente
-                Element elemento = documento.createElement("dni");
-                Text textoElemento = documento.createTextNode(clientes.get(i).getDni());
-                elemento.appendChild(textoElemento);
-                cliente_.appendChild(elemento);
-
-                // Insertamos el nombre del cliente
-                elemento = documento.createElement("nombre");
-                textoElemento = documento.createTextNode(clientes.get(i).getNombre());
-                elemento.appendChild(textoElemento);
-                cliente_.appendChild(elemento);
-
-                // Insertamos la direccion del cliente
-                elemento = documento.createElement("direccion");
-                textoElemento = documento.createTextNode(clientes.get(i).getDireccion());
-                elemento.appendChild(textoElemento);
-                cliente_.appendChild(elemento);
-
-                // Insertamos la localidad del cliente
-                elemento = documento.createElement("localidad");
-                textoElemento = documento.createTextNode(clientes.get(i).getLocalidad());
-                elemento.appendChild(textoElemento);
-                cliente_.appendChild(elemento);
-
-                // Insertamos el código postal del cliente
-                elemento = documento.createElement("cod_postal");
-                textoElemento = documento.createTextNode(clientes.get(i).getCodigoPostal());
-                elemento.appendChild(textoElemento);
-                cliente_.appendChild(elemento);
-
-                //Añadimos al elemento Clientes el elemento Cliente
-                //clientes_XML.appendChild(cliente_);
-                documento.getDocumentElement().appendChild(cliente_);
-
-            }
-
-            //Añadimos el elemento raíz al documento
-            //documento.getDocumentElement().appendChild(clientes_XML);
-
-            //Asociar el source con el Document
-            Source fuente = new DOMSource(documento);
-
-            //Creamos el Result, indicandole el fichero a crear
-            Result resultado = new StreamResult(new File(nombreFichero));
-
-            //Creamos un transformer para crear finalmente el archivo XML
-            Transformer transformer = TransformerFactory.newInstance().newTransformer();
-
-            transformer.transform(fuente, resultado);
-
-            System.out.println("Guardado XML Correctamente");
-
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-
-    }
-    
-    
-    private static void guardarDatosXMLVehiculos() {
-
-        String nombreFichero = "vehiculos.xml";
-
-        String nodo = "Vehiculos";
-        
-
-        try {
-
-            //Creamos una instancia de DocumentBuilderFactory
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-
-            //Creamos el documentBuilder
-            DocumentBuilder builder = factory.newDocumentBuilder();
-
-            //Crear un DOMImplementation
-            DOMImplementation implementation = builder.getDOMImplementation();
-
-            //Creamos el documento con un elemento raíz
-            Document documento = implementation.createDocument(null, nodo, null);
-
-            //Indicamos la versión del documento
-            documento.setXmlVersion("1.0");
-
-            
-
-            for (int i = 0; i < vehiculos.size(); i++) {
-                
-
-                Element vehiculo_ = documento.createElement("Vehiculo");
-                
-                if (vehiculos.get(i) instanceof Deportivo) {
-
-                Deportivo aux = (Deportivo) vehiculos.get(i);
-
-                //Insertamos el Tipo de vehiculo
-                Element elemento = documento.createElement("tipovehiculo");
-                Text textoElemento = documento.createTextNode("DEPORTIVO");
-                elemento.appendChild(textoElemento);
-                vehiculo_.appendChild(elemento);
-                
-                    
-                
-                //Insertamos la matricula
-                elemento = documento.createElement("matricula");
-                textoElemento = documento.createTextNode(aux.getMatricula());
-                elemento.appendChild(textoElemento);
-                vehiculo_.appendChild(elemento);
-                
-                    
-                
-                //Insertamos la marca
-                elemento = documento.createElement("marca");
-                textoElemento = documento.createTextNode(aux.getMarca());
-                elemento.appendChild(textoElemento);
-                vehiculo_.appendChild(elemento);
-                
-               
-                
-                //Insertamos el modelo
-                elemento = documento.createElement("modelo");
-                textoElemento = documento.createTextNode(aux.getModelo());
-                elemento.appendChild(textoElemento);
-                vehiculo_.appendChild(elemento);
-                
-               
-                
-                //Insertamos la cilindrada
-                elemento = documento.createElement("cilindrada");
-                textoElemento = documento.createTextNode(String.valueOf(aux.getCilindrada()));
-                elemento.appendChild(textoElemento);
-                vehiculo_.appendChild(elemento);
-                
-                
-                
-                //Insertamos el numero de puertas
-                elemento = documento.createElement("num_puertas");
-                textoElemento = documento.createTextNode(String.valueOf(aux.getNumPuertas()));
-                elemento.appendChild(textoElemento);
-                vehiculo_.appendChild(elemento);
-                
-                
-                
-                //Insertamos el combustible
-                elemento = documento.createElement("combustible");
-                textoElemento = documento.createTextNode(String.valueOf(aux.getCombustible()));
-                elemento.appendChild(textoElemento);
-                vehiculo_.appendChild(elemento);
-                
-               
-                
-                //Insertamos el cambio
-                elemento = documento.createElement("cambio");
-                textoElemento = documento.createTextNode(String.valueOf(aux.getCambio()));
-                elemento.appendChild(textoElemento);
-                vehiculo_.appendChild(elemento);
-                
-                System.out.println("Cambio");
-                
-                //Insertamos el descapotable
-                elemento = documento.createElement("descapotable");
-                textoElemento = documento.createTextNode(String.valueOf(aux.getDescapotable()));
-                elemento.appendChild(textoElemento);
-                vehiculo_.appendChild(elemento);
-                
-                
-                
-                documento.getDocumentElement().appendChild(vehiculo_);
-                
-                }else{
-                    System.out.println("No entro en el bucle");
-                }
-                
-                
-
-            }
-
-            
-            //Asociar el source con el Document
-            Source fuente = new DOMSource(documento);
-
-            //Creamos el Result, indicandole el fichero a crear
-            Result resultado = new StreamResult(new File(nombreFichero));
-
-            //Creamos un transformer para crear finalmente el archivo XML
-            Transformer transformer = TransformerFactory.newInstance().newTransformer();
-
-            transformer.transform(fuente, resultado);
-
-            System.out.println("Guardado XML Correctamente");
-
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-
     }
 
 }
